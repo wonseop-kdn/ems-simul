@@ -1,5 +1,11 @@
 import { useMemo, useState } from 'react';
-import { CheckCircle2, ShieldAlert, ShieldCheck, Zap } from 'lucide-react';
+import {
+  CheckCircle2,
+  Lightbulb,
+  ShieldAlert,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react';
 import {
   runContingencyAnalysis,
   type ContingencyReport,
@@ -63,7 +69,39 @@ export default function ContingencyPanel({ state }: Props) {
               : 'N-1 취약: 일부 고장에 정전/과부하 발생'}
           </div>
 
+          {/* 운영 권고 (보강 방안) */}
           <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-300">
+              <Lightbulb size={13} /> 운영 권고 · Operator Advisory
+            </div>
+            {report.advice.map((a, i) => {
+              const c =
+                a.level === 'critical'
+                  ? '#f43f5e'
+                  : a.level === 'warn'
+                    ? '#fbbf24'
+                    : '#34d399';
+              return (
+                <div
+                  key={i}
+                  className="rounded-lg border-l-2 bg-slate-800/40 p-2.5"
+                  style={{ borderColor: c }}
+                >
+                  <div className="text-[12px] font-bold" style={{ color: c }}>
+                    {a.title}
+                  </div>
+                  <div className="mt-0.5 text-[10.5px] leading-relaxed text-slate-300">
+                    {a.detail}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              상정고장별 결과
+            </div>
             {report.cases.map((c) => {
               const sev = SEV_STYLE[c.severity];
               return (
