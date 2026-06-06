@@ -1,0 +1,212 @@
+import { useState } from 'react';
+import { AlertTriangle, CheckCircle2, Radar } from 'lucide-react';
+import { runStateEstimation, type SEResult } from '../engine/stateEstimation';
+import type { OperatingState } from '../engine/types';
+import { COLORS, fmt, fmtSigned } from './visuals';
+
+interface Props {
+  state: OperatingState;
+}
+
+export default function StateEstimationPanel({ state }: Props) {
+  const [withBad, setWithBad] = useState(false);
+  const [se, setSe] = useState<SEResult | null>(null);
+
+  const run = () => setSe(runStateEstimation(state, { withBadData: withBad }));
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Radar size={15} className="text-cyan-400" />
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+          상태 추정 · WLS State Estimation
+        </h3>
+      </div>
+
+      <p className="text-[11px] leading-relaxed text-slate-400">
+        SCADA 계측값(전압·주입·조류)에 가우시안 노이즈를 주입하고, 가중최소자승(WLS)
+        으로 참 상태를 복원합니다. 카이제곱 검정 + 최대정규화잔차(LNR)로 불량
+        데이터를 검출·식별합니다.
+      </p>
+
+      <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-800/30 p-2.5 text-[12px] text-slate-200">
+        <input
+          type="checkbox"
+          checked={withBad}
+          onChange={(e) => setWithBad(e.target.checked)}
+          className="h-4 w-4 accent-rose-500"
+        />
+        불량 데이터(Bad Data) 주입 — 선로 조류 계측에 총오차 +45MW
+      </label>
+
+      <button
+        onClick={run}
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500/90 py-2 text-xs font-bold text-white transition hover:bg-cyan-500"
+      >
+        <Radar size={14} /> 상태추정 실행
+      </button>
+
+      {se && !se.ok && (
+        <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-2.5 text-[11px] text-amber-300">
+          {se.message}
+        </div>
+      )}
+
+      {se && se.ok && (
+        <>
+          {/* 검출 요약 */}
+          <div
+            className="flex items-start gap-2 rounded-lg border p-2.5"
+            style={{
+              borderColor: se.badDataDetected ? '#f43f5e55' : '#34d39955',
+              backgroundColor: se.badDataDetected ? '#f43f5e12' : '#34d39912',
+            }}
+          >
+            {se.badDataDetected ? (
+              <AlertTriangle size={16} className="mt-0.5 shrink-0 text-rose-400" />
+            ) : (
+              <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-400" />
+            )}
+            <div className="text-[11px] leading-tight">
+              <div
+                className="font-bold"
+                style={{ color: se.badDataDetected ? COLORS.overload : COLORS.flow }}
+              >
+                {se.badDataDetected
+                  ? '불량 데이터 검출됨 (χ² 검정 초과)'
+                  : '정상 — 불량 데이터 없음'}
+              </div>
+              {se.identifiedLabel && (
+                <div className="mt-0.5 text-rose-300">
+                  식별된 이상 계측: <span className="font-mono">{se.identifiedLabel}</span>{' '}
+                  (최대정규화잔차)
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* χ² 게이지 */}
+          <div className="rounded-lg border border-slate-700/50 bg-slate-800/30 p-2.5">
+            <div className="mb-1 flex justify-between text-[10.5px] text-slate-400">
+              <span>
+                목적함수 J(x̂) ={' '}
+                <span className="font-mono font-bold text-slate-200">
+                  {fmt(se.objectiveJ, 1)}
+                </span>
+              </span>
+              <span>
+                임계값 χ²₀.₉₉ ={' '}
+                <span className="font-mono">{fmt(se.chiThreshold, 1)}</span>
+              </span>
+            </div>
+            <div className="relative h-2.5 overflow-hidden rounded-full bg-slate-900/80">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${Math.min((se.objectiveJ / (se.chiThreshold * 1.5)) * 100, 100)}%`,
+                  backgroundColor: se.badDataDetected ? COLORS.overload : COLORS.flow,
+                }}
+              />
+              <div
+                className="absolute top-0 h-full w-[2px] bg-slate-300"
+                style={{ left: `${Math.min((1 / 1.5) * 100, 100)}%` }}
+              />
+            </div>
+            <div className="mt-1 flex justify-between text-[9.5px] text-slate-500">
+              <span>자유도 {se.dof} · {se.iterations}회 반복 수렴</span>
+              <span>↑ 임계선</span>
+            </div>
+          </div>
+
+          {/* 추정 상태 vs 참값 */}
+          <div className="rounded-lg border border-slate-700/50 bg-slate-800/30 p-2.5">
+            <div className="mb-1.5 text-[11px] font-semibold text-slate-300">
+              복원된 상태량 (추정 vs 참)
+            </div>
+            <div className="grid grid-cols-1 gap-1">
+              {se.states.map((s) => (
+                <div
+                  key={s.busId}
+                  className="flex items-center justify-between text-[10.5px]"
+                >
+                  <span className="text-slate-400">모선 {s.busId}</span>
+                  <span className="font-mono text-slate-300">
+                    V̂ {fmt(s.vEst, 4)}
+                    <span className="text-slate-500"> (참 {fmt(s.vTrue, 4)})</span>
+                    {'  '}
+                    θ̂ {fmtSigned(s.thEstDeg, 2)}°
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 계측 잔차 테이블 */}
+          <div className="rounded-lg border border-slate-700/50 bg-slate-800/30 p-2.5">
+            <div className="mb-1.5 text-[11px] font-semibold text-slate-300">
+              계측 잔차 분석 ({se.rows.length}개 계측)
+            </div>
+            <div className="max-h-52 overflow-y-auto">
+              <table className="w-full text-[10px]">
+                <thead className="sticky top-0 bg-slate-800 text-slate-400">
+                  <tr>
+                    <th className="py-1 text-left font-medium">계측</th>
+                    <th className="text-right font-medium">측정</th>
+                    <th className="text-right font-medium">추정</th>
+                    <th className="text-right font-medium">rₙ</th>
+                  </tr>
+                </thead>
+                <tbody className="font-mono">
+                  {se.rows.map((r, i) => {
+                    const danger = r.flagged;
+                    const warn = !danger && r.normResidual > 3;
+                    return (
+                      <tr
+                        key={i}
+                        style={{
+                          backgroundColor: danger
+                            ? '#f43f5e22'
+                            : r.injectedBad
+                              ? '#f59e0b14'
+                              : undefined,
+                        }}
+                      >
+                        <td className="py-0.5 text-left text-slate-300">
+                          {r.label}
+                          {r.injectedBad && (
+                            <span className="ml-1 text-amber-400">◆</span>
+                          )}
+                        </td>
+                        <td className="text-right text-slate-300">
+                          {fmt(r.measured, r.unit === 'pu' ? 3 : 1)}
+                        </td>
+                        <td className="text-right text-slate-400">
+                          {fmt(r.estimated, r.unit === 'pu' ? 3 : 1)}
+                        </td>
+                        <td
+                          className="text-right font-bold"
+                          style={{
+                            color: danger
+                              ? COLORS.overload
+                              : warn
+                                ? COLORS.flowHigh
+                                : COLORS.subtext,
+                          }}
+                        >
+                          {fmt(r.normResidual, 2)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-1.5 text-[9px] text-slate-500">
+              ◆ 주입된 불량데이터 · rₙ = 정규화잔차 (&gt;3 의심, 적색 = LNR 식별)
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
