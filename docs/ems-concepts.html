@@ -322,16 +322,65 @@ B5      ·        ·        ·    −1.7+6.2j    ·        ·     1.7−6.2j
 <div class="chapter-header"><div class="chapter-num">Q 06</div>
 <h2>N-1: 선로 개방 시 Ybus 변화<span class="en">Contingency on the Ybus</span></h2></div>
 
-<p>계통해석이란 곧 "개방된 상태의 Ybus를 다시 짜서 조류해석을 푸는 것"입니다. 두 대표 케이스를 실제 엔진으로 확인했습니다.</p>
+<p>계통해석이란 곧 "개방된 상태의 Ybus를 다시 짜서 조류해석을 푸는 것"입니다. 세 대표 케이스를 실제 엔진으로 확인했습니다.</p>
 
-<h3>선로1 개방 → 전 계통 블랙아웃</h3>
-<p>y₁₆이 빠지면 모선1(Slack)은 <strong>연결선이 그것 하나뿐</strong>이라 완전 고립됩니다. Slack에서 BFS로 도달 가능한 건 {1}뿐 → 나머지 전부 비가압.</p>
+<h3>❓ 선로1을 열면 전 계통 정전인데, 선로2를 열면 왜 정전이 아닌가?</h3>
+
+<p>핵심은 <strong>연결성 탐색(BFS)이 항상 Slack(Bus1)에서 출발</strong>한다는 점입니다.</p>
+
+<div class="grid-2">
+  <div class="card" style="border-color: var(--rose);">
+    <h4 style="color:var(--rose);">🔴 선로1 개방 (Bus1↔Bus6)</h4>
+    <div class="sys-diagram" style="padding:12px; font-size:11px; line-height:1.8;">Bus1(Slack) ─<span class="rose">╳</span>─ Bus6 ── Bus7 ── 부하
+Bus2(PV)   ──────┘</div>
+    <p style="font-size:12.5px; margin:8px 0 0;">Bus1(Slack)에서 BFS 시작 → <strong>선로1이 유일한 통로인데 끊김</strong> → 도달 가능: {Bus1}만 → Bus2,6,7,3,4,5 전부 고립 → <span class="rose">90MW 전 계통 정전</span></p>
+  </div>
+  <div class="card" style="border-color: var(--green);">
+    <h4 style="color:var(--green);">✅ 선로2 개방 (Bus2↔Bus6)</h4>
+    <div class="sys-diagram" style="padding:12px; font-size:11px; line-height:1.8;">Bus1(Slack) ──── Bus6 ── Bus7 ── 부하
+Bus2(PV)   ─<span class="rose">╳</span>─────┘</div>
+    <p style="font-size:12.5px; margin:8px 0 0;">Bus1(Slack)에서 BFS 시작 → <strong>선로1은 살아있음</strong> → Bus6·7·3·4·5 도달 → Bus2만 고립 (발전기뿐, 부하 없음) → <span class="green">부하 정전 0MW</span></p>
+  </div>
+</div>
+
+<div class="highlight-box">
+  <strong>왜 Bus2 고립은 괜찮은가?</strong><br/>
+  Bus2는 발전기 전용 모선으로 소비 부하가 없습니다. Bus2가 탈락하면 50MW 발전이 사라지지만, Slack(Bus1)이 균형자 역할로 그 50MW를 자동 보충합니다. 수용가 입장에서는 전력 공급이 끊기지 않습니다.<br/><br/>
+  <strong>비유:</strong> 발전소 2개(Bus1·Bus2) 중 하나(Bus2)가 꺼졌을 때, 나머지 발전소(Bus1)가 출력을 올려 커버하는 것과 같습니다.
+</div>
+
+<div class="table-wrap"><table>
+  <thead><tr><th>개방 선로</th><th>BFS 도달 가능 모선</th><th>고립 모선</th><th>정전 부하</th><th>이유</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>선로1</strong> (Slack 연계)</td>
+      <td class="mono">Bus1만</td>
+      <td class="rose mono">Bus2,6,7,3,4,5</td>
+      <td class="rose">90 MW</td>
+      <td>Slack이 섬이 됨 → 기준전원 상실</td>
+    </tr>
+    <tr>
+      <td><strong>선로2</strong> (PV 연계)</td>
+      <td class="mono">Bus1,6,7,3,4,5</td>
+      <td class="amber mono">Bus2만</td>
+      <td class="green">0 MW</td>
+      <td>발전기만 탈락, Slack이 보충</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<div class="warn-box">
+  <strong>결론:</strong> 선로1이 특별히 위험한 이유는 <strong>Slack이 계통에 연결되는 유일한 통로</strong>이기 때문입니다. Slack을 잃으면 나머지가 물리적으로 연결돼 있어도 해석 기준 자체가 사라집니다. 이것이 "Slack 연계선은 반드시 2회선 이상"을 요구하는 이유입니다.
+</div>
+
+<h3>선로1 개방 Ybus</h3>
+<p>y₁₆이 빠지면 모선1은 연결선이 없어 Ybus가 사실상 비어버립니다.</p>
 <div class="formula">===== 선로1 개방 =====
 가압모선: 1 | 고립: 2,6,7,3,4,5
 Ybus = [ 0 ]            ← 모선1 혼자, 연결선 없음
 
 → <span class="rose">90MW 전 부하 정전</span> (기준전원 상실 = 블랙아웃)</div>
-<div class="highlight-box"><strong>흥미로운 점:</strong> 모선2(PV)+6+7+부하는 물리적으로 살아있지만, Slack(기준)을 잃은 "섬"이라 이 모델은 정전 처리합니다. 실계통이라면 모선2가 새 기준이 되어 섬 운전을 시도하나, 발전 50MW &lt; 부하 90MW라 결국 일부 정전(부하차단)됩니다.</div>
+<div class="highlight-box"><strong>참고:</strong> 모선2(PV)+6+7+부하는 물리적으로 서로 연결돼 있지만, Slack(기준)을 잃은 "섬"이라 이 모델은 정전 처리합니다. 실계통이라면 모선2가 새 기준이 되어 섬 운전(islanding)을 시도하나, 발전 50MW &lt; 부하 90MW라 결국 부하 차단이 불가피합니다.</div>
 
 <h3>선로4 개방 → 모선3만 고립 (30MW)</h3>
 <p>y₇₃(1.66−j6.22)이 빠지고, 모선3은 선로4 하나로만 연결돼 고립됩니다. 모선7 대각항이 그만큼 감소:</p>
@@ -339,7 +388,7 @@ Ybus = [ 0 ]            ← 모선1 혼자, 연결선 없음
 가압모선: 1,2,6,7,4,5 | 고립: 3
 Y77: 6.90−j28.29  →  <span class="amber">5.24 − j22.06</span>   (y₇₃ 만큼 감소) ✓
 → 모선3의 30MW만 상실, 나머지 계통은 정상 수렴</div>
-<div class="warn-box"><strong>정정:</strong> 개방되는 선로4는 <strong>모선7↔모선3</strong>이므로 빠지는 성분은 Y₃₃·Y₇₃·Y₃₇ 와 Y₇₇ 감소분입니다. 모선4(질문의 y44)는 선로5로 연결돼 그대로 살아있습니다.</div>
+<div class="warn-box"><strong>주의:</strong> 개방되는 선로4는 <strong>모선7↔모선3</strong>이므로 빠지는 성분은 Y₃₃·Y₇₃·Y₃₇ 와 Y₇₇ 감소분입니다. 모선4는 선로5로 연결돼 그대로 살아있습니다.</div>
 </div>
 
 
