@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, CheckCircle2, Radar } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronRight, Radar } from 'lucide-react';
 import { runStateEstimation, type SEResult } from '../engine/stateEstimation';
 import type { OperatingState } from '../engine/types';
 import { COLORS, fmt, fmtSigned } from './visuals';
@@ -11,6 +11,7 @@ interface Props {
 export default function StateEstimationPanel({ state }: Props) {
   const [withBad, setWithBad] = useState(false);
   const [se, setSe] = useState<SEResult | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   const run = () => setSe(runStateEstimation(state, { withBadData: withBad }));
 
@@ -28,6 +29,88 @@ export default function StateEstimationPanel({ state }: Props) {
         으로 참 상태를 복원합니다. 카이제곱 검정 + 최대정규화잔차(LNR)로 불량
         데이터를 검출·식별합니다.
       </p>
+
+      {/* ── 개념 설명 (접이식) ───────────────────────────── */}
+      <div className="rounded-lg border border-cyan-700/40 bg-cyan-500/5">
+        <button
+          onClick={() => setShowHelp((v) => !v)}
+          className="flex w-full items-center gap-1.5 px-2.5 py-2 text-[11px] font-semibold text-cyan-300"
+        >
+          {showHelp ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+          상태추정이란? — 수식 단계별 설명 보기
+        </button>
+        {showHelp && (
+          <div className="space-y-2.5 border-t border-cyan-700/30 px-3 py-2.5 text-[10.5px] leading-relaxed text-slate-300">
+            <div>
+              <span className="font-bold text-cyan-300">한 줄 요약.</span> 측정값이
+              미지수보다 많다는 점(여분)을 이용해, 노이즈는 평균으로 상쇄하고 튀는
+              값 하나(불량)는 도드라지게 만들어 잡아내는 기법입니다.
+            </div>
+
+            <div>
+              <div className="font-bold text-slate-200">STEP 0 · 비유 (체중 3번 재기)</div>
+              체중을 70.1·69.8·70.3kg 으로 쟀다면 진짜 몸무게는 평균 70.07. 측정이
+              여러 개라 추정이 가능합니다. 여기에 ① 정밀도 가중치, ② 비선형 반복만
+              더하면 계통 상태추정이 됩니다.
+            </div>
+
+            <div>
+              <div className="font-bold text-slate-200">STEP 1 · 모르는 것 / 아는 것</div>
+              <div className="mt-1 rounded bg-slate-900/60 p-2 font-mono text-[9.5px] text-slate-400">
+                상태 x = 13개  (θ₂~θ₇ 6 + V₁~V₇ 7){'\n'}
+                계측 z = 31개  (V 7 + Pinj·Qinj 각6 + Pflow·Qflow 각6){'\n'}
+                여분 = 31 − 13 = <span className="text-cyan-300">18</span> ← 오차를 거르는 잉여
+              </div>
+            </div>
+
+            <div>
+              <div className="font-bold text-slate-200">STEP 2~3 · 예측 h(x)와 목적함수 J</div>
+              상태 x로 각 계측이 얼마여야 하는지 계산한 값이 h(x). 측정 z와의 차이를
+              정밀도로 가중해 제곱·합산한 게 J입니다.
+              <div className="mt-1 rounded bg-slate-900/60 p-2 font-mono text-[9.5px] text-slate-400">
+                rᵢ = zᵢ − hᵢ(x)        (측정 − 예측){'\n'}
+                wᵢ = 1/σᵢ²            (정밀할수록 큰 가중치){'\n'}
+                J(x) = Σ (zᵢ − hᵢ(x))² / σᵢ²  → 최소로 만드는 x̂ 가 답
+              </div>
+            </div>
+
+            <div>
+              <div className="font-bold text-slate-200">STEP 4 · Gauss-Newton 반복</div>
+              h가 비선형이라 한 번에 못 풉니다. 야코비안 H=∂h/∂x 로 반복 보정합니다.
+              <div className="mt-1 rounded bg-slate-900/60 p-2 font-mono text-[9.5px] text-slate-400">
+                (HᵀWH) Δx = HᵀW (z − h(x)){'\n'}
+                x ← x + Δx,  |Δx|&lt;1e-7 까지 (실제 4회 수렴)
+              </div>
+            </div>
+
+            <div>
+              <div className="font-bold text-rose-300">STEP 5 · 검출 — χ² 검정</div>
+              추정 후 남은 J가 "전체적으로 얼마나 안 맞았나". 정상이면 J는 자유도 18
+              카이제곱 분포를 따릅니다.
+              <div className="mt-1 rounded bg-slate-900/60 p-2 font-mono text-[9.5px] text-slate-400">
+                임계값 χ²₀.₉₉(18) = 34.83{'\n'}
+                정상:  J ≈ <span className="text-emerald-300">17</span>  &lt; 34.83 → 통과{'\n'}
+                불량:  J ≈ <span className="text-rose-300">1900</span> ≫ 34.83 → 검출
+              </div>
+            </div>
+
+            <div>
+              <div className="font-bold text-rose-300">STEP 6 · 식별 — 정규화잔차(LNR)</div>
+              범인을 찾으려면 잔차를 표준편차로 나눠 공정하게 비교합니다.
+              <div className="mt-1 rounded bg-slate-900/60 p-2 font-mono text-[9.5px] text-slate-400">
+                rₙ,ᵢ = |rᵢ| / √Ωᵢᵢ,  Ω = R − H(HᵀWH)⁻¹Hᵀ{'\n'}
+                최대 rₙ = 범인 → P7-3 정확히 지목 ✓
+              </div>
+            </div>
+
+            <div className="rounded bg-amber-500/10 p-2 text-amber-200/90">
+              <span className="font-bold">Smearing(파급):</span> 불량은 P7-3 하나뿐인데
+              인근 계측도 노란색이 됩니다. 추정이 오염값에 끌려가 인근 잔차도 덩달아
+              커진 것일 뿐(실제 오류 아님). 그래서 한 번에 하나씩만 제거합니다.
+            </div>
+          </div>
+        )}
+      </div>
 
       <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-800/30 p-2.5 text-[12px] text-slate-200">
         <input
