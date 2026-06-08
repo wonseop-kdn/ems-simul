@@ -71,11 +71,20 @@ export interface BranchResult {
   flowMW: number; // 조류 크기 (MW)
 }
 
+/** NR 반복별 최대 불일치 기록 */
+export interface MismatchPoint {
+  iter: number;
+  max: number; // pu
+  bus: number; // 최대 불일치가 발생한 모선 id
+  kind: 'P' | 'Q'; // 유효/무효 전력 불일치
+}
+
 /** 전체 해석 결과 */
 export interface SolveResult {
   converged: boolean;
   iterations: number;
   maxMismatch: number;
+  mismatchHistory: MismatchPoint[];
   buses: Record<number, BusResult>;
   branches: Record<number, BranchResult>;
   totalGenMW: number;

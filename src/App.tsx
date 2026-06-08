@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   CircuitBoard,
   Gauge,
+  LineChart,
   Radar,
   ShieldAlert,
   Sliders,
@@ -12,6 +13,7 @@ import {
 import { runPowerFlow } from './engine/powerflow';
 import { DEFAULT_STATE } from './engine/systemModel';
 import type { OperatingState } from './engine/types';
+import AnalysisPanel from './components/AnalysisPanel';
 import BranchMonitor from './components/BranchMonitor';
 import ContingencyPanel from './components/ContingencyPanel';
 import ControlPanel from './components/ControlPanel';
@@ -20,11 +22,12 @@ import StateEstimationPanel from './components/StateEstimationPanel';
 import Tooltip from './components/Tooltip';
 import { COLORS } from './components/visuals';
 
-type Tab = 'control' | 'monitor' | 'contingency' | 'se';
+type Tab = 'control' | 'monitor' | 'analysis' | 'contingency' | 'se';
 
 const TABS: { id: Tab; label: string; icon: typeof Sliders }[] = [
   { id: 'control', label: '운전 제어', icon: Sliders },
   { id: 'monitor', label: '선로 현황', icon: Activity },
+  { id: 'analysis', label: '수렴·전압', icon: LineChart },
   { id: 'contingency', label: 'N-1 해석', icon: ShieldAlert },
   { id: 'se', label: '상태 추정', icon: Radar },
 ];
@@ -190,6 +193,7 @@ export default function App() {
               />
             )}
             {tab === 'monitor' && <BranchMonitor result={result} />}
+            {tab === 'analysis' && <AnalysisPanel result={result} />}
             {tab === 'contingency' && <ContingencyPanel state={state} />}
             {tab === 'se' && <StateEstimationPanel state={state} />}
           </div>

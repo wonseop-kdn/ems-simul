@@ -23,6 +23,8 @@ interface NRSolution {
   converged: boolean;
   iterations: number;
   maxMismatch: number;
+  /** 반복별 최대 불일치 추이 (iter0, iter1, …) */
+  mismatchHistory: { iter: number; max: number; bus: number; kind: 'P' | 'Q' }[];
 }
 
 export function newtonRaphson(net: Network, maxIter = 50, tol = 1e-8): NRSolution {
@@ -48,6 +50,7 @@ export function newtonRaphson(net: Network, maxIter = 50, tol = 1e-8): NRSolutio
   let converged = dim === 0;
   let iter = 0;
   let maxMismatch = 0;
+  const mismatchHistory: NRSolution['mismatchHistory'] = [];
 
   for (iter = 0; iter < maxIter && !converged; iter++) {
     // 1) 계산 주입 & 불일치
@@ -69,7 +72,25 @@ export function newtonRaphson(net: Network, maxIter = 50, tol = 1e-8): NRSolutio
       mismatch[na + v] = net.qSched[i] - Qc[i];
     }
 
-    maxMismatch = mismatch.reduce((m, x) => Math.max(m, Math.abs(x)), 0);
+    // 최대 불일치 성분의 위치(어느 모선의 P인지 Q인지) 추적
+    let mmMax = 0;
+    let mmIdx = 0;
+    for (let k = 0; k < dim; k++) {
+      if (Math.abs(mismatch[k]) > mmMax) {
+        mmMax = Math.abs(mismatch[k]);
+        mmIdx = k;
+      }
+    }
+    maxMismatch = mmMax;
+    const mmKind: 'P' | 'Q' = mmIdx < na ? 'P' : 'Q';
+    const mmLocal = mmIdx < na ? angleIdx[mmIdx] : voltIdx[mmIdx - na];
+    mismatchHistory.push({
+      iter,
+      max: mmMax,
+      bus: net.energized[mmLocal],
+      kind: mmKind,
+    });
+
     if (maxMismatch < tol) {
       converged = true;
       break;
@@ -117,13 +138,13 @@ export function newtonRaphson(net: Network, maxIter = 50, tol = 1e-8): NRSolutio
     try {
       dx = solveLinear(J, mismatch);
     } catch {
-      return { V, th, converged: false, iterations: iter + 1, maxMismatch };
+      return { V, th, converged: false, iterations: iter + 1, maxMismatch, mismatchHistory };
     }
     for (let a = 0; a < na; a++) th[angleIdx[a]] += dx[a];
     for (let v = 0; v < nv; v++) V[voltIdx[v]] += dx[na + v];
   }
 
-  return { V, th, converged, iterations: iter, maxMismatch };
+  return { V, th, converged, iterations: iter, maxMismatch, mismatchHistory };
 }
 
 /** 통전 선로의 양단 조류(pu) 계산 */
@@ -286,6 +307,7 @@ export function runPowerFlow(state: OperatingState): SolveResult {
     converged: sol.converged,
     iterations: sol.iterations,
     maxMismatch: sol.maxMismatch,
+    mismatchHistory: sol.mismatchHistory,
     buses,
     branches,
     totalGenMW,
