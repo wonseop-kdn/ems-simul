@@ -148,6 +148,7 @@
       <li><span>PV 버스와 AVR</span><span class="pg">Q8</span></li>
       <li><span>변압기·선로 손실 분석</span><span class="pg">Q9</span></li>
       <li><span>역조류와 Slack 흡수 (실계통)</span><span class="pg">Q10</span></li>
+      <li><span>PF · N-1 · 상태추정 · Topology — 관계와 EMS 실행 순서</span><span class="pg">Q11-A</span></li>
       <li><span>WLS 상태추정 — 수식 상세</span><span class="pg">Q11</span></li>
       <li><span>무효전력과 전압의 관계</span><span class="pg">Q12</span></li>
     </ol>
@@ -841,6 +842,85 @@ V_단자 &gt; V_set → 계자전류 I_f ↓ → E_q ↓ → <span class="rose">
 <p>22.9kV단 분산전원이 지역 부하보다 많으면, 남는 전력이 변압기를 <strong>거꾸로</strong> 타고 상위전압으로 올라가 연계된 다른 변전소·지역으로 흐릅니다.</p>
 
 <div class="warn-box"><strong>실무 이슈:</strong> 역조류가 생기면 변압기 탭 절환, 보호계전기 정정, 전압조정 방향이 모두 <strong>양방향</strong>을 고려해야 합니다. 태양광 보급 확대로 배전계통의 핵심 과제가 되었습니다.</div>
+</div>
+
+
+<!-- ════════════════════════ Q11-A ════════════════════════ -->
+<div class="chapter" id="q11a">
+<div class="chapter-header"><div class="chapter-num">Q 11-A</div>
+<h2>PF · N-1 · 상태추정 · Topology — 관계와 EMS 실행 순서<span class="en">How PF, N-1, SE &amp; Topology Fit Together</span></h2></div>
+
+<h3>이 시뮬레이터에서 하는 게 PF입니까?</h3>
+<p>네, 맞습니다. 슬라이더로 PV 발전량·부하량을 바꾸거나 차단기를 열고 닫을 때마다 내부에서 Newton-Raphson이 돌아가고, 화면에 나오는 전압·선로 부하율·과부하 경보가 모두 <strong>Power Flow(조류계산)</strong> 결과물입니다.</p>
+<div class="formula">입력:  발전량(P, V 지정) + 부하량(P, Q 지정) + 계통 구성(어떤 차단기가 닫혀있나)
+  ↓  Newton-Raphson
+출력:  각 모선의 전압·위상각 + 각 선로의 조류·손실·부하율</div>
+
+<h3>PF · N-1 · 상태추정은 별개인가, 연결되나?</h3>
+<p><strong>도구로서는 별개</strong>이지만, 실제 EMS에서는 <strong>순서대로 쌓아서</strong> 씁니다. 아래가 실제 EMS의 실시간 운영 흐름입니다.</p>
+<div class="formula">① Topology Processing   → "지금 어떤 모선이 어떻게 연결돼 있나" 파악
+         ↓
+② 상태추정 (WLS SE)      → "현장 계측값으로 현재 V·θ 확정"
+         ↓
+③ PF                     → "확정된 상태에서 조류 계산"
+         ↓
+④ N-1 해석               → "선로 하나씩 끊어가며 PF 반복"</div>
+
+<div class="table-wrap"><table>
+  <thead><tr><th>개념</th><th>한 줄 정의</th><th>방향</th><th>이 시뮬레이터에서</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Topology<br/>Processing</strong></td>
+      <td>모선·선로 배치 + 차단기 상태로 현재 전기적 연결 구조 파악</td>
+      <td>설비 정보 → Ybus</td>
+      <td>차단기 ON/OFF 시 BFS로 연결 재파악 → Ybus 재구성</td>
+    </tr>
+    <tr>
+      <td><strong>PF</strong></td>
+      <td>운전 조건을 주면 전압·조류를 예측</td>
+      <td>조건 → 결과 (순방향)</td>
+      <td>슬라이더·차단기 조작 시 자동 실행</td>
+    </tr>
+    <tr>
+      <td><strong>N-1 해석</strong></td>
+      <td>설비 하나씩 끊어가며 PF를 반복</td>
+      <td>PF × 선로 수</td>
+      <td>차단기 하나씩 수동으로 열어보는 것이 수동 N-1</td>
+    </tr>
+    <tr>
+      <td><strong>상태추정</strong></td>
+      <td>잡음 섞인 계측값으로 현재 상태를 역추정</td>
+      <td>계측 → 상태 (역방향)</td>
+      <td>별도 탭, PF와 독립 실행</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h3>각 개념을 좀 더 풀어서</h3>
+
+<h4 style="color:var(--accent); margin:10px 0 4px;">① Topology Processing</h4>
+<p>실제 변전소에는 차단기·단로기가 수십 개씩 달려 있어서, 어떤 게 닫혔냐에 따라 전기적 연결이 실시간으로 바뀝니다. 이 차단기 상태를 읽어서 "지금 어떤 모선이 어떻게 이어져 있나"를 자동으로 파악하는 것이 <strong>Topology Processing</strong>입니다. 이 시뮬레이터도 차단기를 열고 닫을 때 BFS(너비우선탐색)로 Slack에서 도달 가능한 모선을 골라내고 Ybus를 재구성합니다. 이 시뮬레이터의 계통 그림 자체(모선 7개, 선로 6개 배치)가 <strong>네트워크 토폴로지</strong>입니다.</p>
+
+<h4 style="color:var(--accent); margin:10px 0 4px;">② 상태추정 — PF보다 먼저 실행하는 이유</h4>
+<p>PF는 "발전·부하 조건을 주면 전압·조류를 계산"합니다. 그런데 실제 EMS에서는 발전·부하 조건 자체를 <strong>현장 계측기로 읽어옵니다.</strong> 그 계측값에는 잡음·오차·고장 미터가 섞여 있어서, 이걸 그대로 PF에 넣으면 틀린 결과가 나옵니다. 그래서 PF 이전에 <strong>WLS 상태추정으로 계측값을 통계적으로 정제해서 신뢰할 수 있는 V·θ 스냅샷을 만든 다음</strong> PF를 돌립니다.</p>
+<div class="formula">상태추정 없이:  잡음 섞인 계측값 → PF → 부정확한 조류 결과
+상태추정 있을 때: 잡음 섞인 계측값 → WLS → 정제된 V·θ → PF → 신뢰할 수 있는 결과</div>
+
+<h4 style="color:var(--accent); margin:10px 0 4px;">③ PF와 N-1의 관계 — N-1은 PF의 반복 응용</h4>
+<p>N-1 해석은 별도 알고리즘이 아닙니다. <strong>PF를 선로 수만큼 자동으로 반복 실행</strong>하는 것입니다.</p>
+<div class="formula">선로1 차단 → PF 실행 → 위반 확인
+선로2 차단 → PF 실행 → 위반 확인
+선로3(TR) 차단 → PF 실행 → 위반 확인
+...
+선로6 차단 → PF 실행 → 위반 확인
+              ↓
+"N-1 위반 목록" 출력  (과부하·저전압 발생 케이스)</div>
+<p>이 시뮬레이터에서 차단기를 하나씩 수동으로 열어보는 것이 바로 <strong>수동 N-1 해석</strong>입니다. 실제 EMS는 선로가 수백 개라 이걸 자동으로 돌려 "어느 N-1에서 위반 발생" 목록을 수 초 안에 냅니다.</p>
+
+<div class="highlight-box">
+  <strong>한 줄 요약:</strong>
+  Topology가 지도를 그리고 → 상태추정이 현재 위치를 확인하고 → PF가 경로를 계산하고 → N-1이 "각 도로가 막히면?" 을 시뮬레이션합니다. 네 가지는 <strong>순서가 있는 한 파이프라인</strong>이며, 이 시뮬레이터는 그 파이프라인 전체를 하나의 화면에서 교육용으로 단순화해 보여줍니다.
+</div>
 </div>
 
 
