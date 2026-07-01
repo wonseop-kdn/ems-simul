@@ -88,12 +88,12 @@ export const BUSES: BusDef[] = [
 ];
 
 export const BRANCHES: BranchDef[] = [
-  { id: 1, name: '선로 1', from: 1, to: 6, r: 0.01, x: 0.03, limitMW: 120, isTransformer: false },
-  { id: 2, name: '선로 2', from: 2, to: 6, r: 0.01, x: 0.03, limitMW: 120, isTransformer: false },
-  { id: 3, name: '변압기 TR', from: 6, to: 7, r: 0.02, x: 0.1, limitMW: 180, isTransformer: true },
-  { id: 4, name: '선로 4', from: 7, to: 3, r: 0.04, x: 0.15, limitMW: 100, isTransformer: false },
-  { id: 5, name: '선로 5', from: 7, to: 4, r: 0.04, x: 0.15, limitMW: 100, isTransformer: false },
-  { id: 6, name: '선로 6', from: 7, to: 5, r: 0.04, x: 0.15, limitMW: 100, isTransformer: false },
+  { id: 1, name: '선로 1', from: 1, to: 6, r: 0.01, x: 0.03, limitMW: 160, isTransformer: false },
+  { id: 2, name: '선로 2', from: 2, to: 6, r: 0.01, x: 0.03, limitMW: 160, isTransformer: false },
+  { id: 3, name: '변압기 TR', from: 6, to: 7, r: 0.02, x: 0.1, limitMW: 120, isTransformer: true },
+  { id: 4, name: '선로 4', from: 7, to: 3, r: 0.04, x: 0.15, limitMW: 40, isTransformer: false },
+  { id: 5, name: '선로 5', from: 7, to: 4, r: 0.04, x: 0.15, limitMW: 40, isTransformer: false },
+  { id: 6, name: '선로 6', from: 7, to: 5, r: 0.04, x: 0.15, limitMW: 40, isTransformer: false },
 ];
 
 /** 부하 제어 대상 모선 (수집/배전 모선은 제외) */
