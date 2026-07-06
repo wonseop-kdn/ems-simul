@@ -21,7 +21,7 @@ export const BUSES: BusDef[] = [
     category: 'generator',
     x: 150,
     y: 165,
-    baseKV: 154,
+    baseKV: 345,
     vSet: 1.05,
   },
   {
@@ -32,7 +32,7 @@ export const BUSES: BusDef[] = [
     category: 'generator',
     x: 150,
     y: 435,
-    baseKV: 154,
+    baseKV: 345,
     vSet: 1.05,
   },
   {
@@ -43,17 +43,17 @@ export const BUSES: BusDef[] = [
     category: 'collector',
     x: 380,
     y: 300,
-    baseKV: 154,
+    baseKV: 345,
   },
   {
     id: 7,
     name: 'Bus 7',
     type: 'pq',
-    role: '변압기 2차측 배전 모선 (Secondary Distribution) · 소비 0',
+    role: '변압기 2차측 변전 모선 (Secondary Substation) · 소비 0',
     category: 'distribution',
     x: 640,
     y: 300,
-    baseKV: 22.9,
+    baseKV: 154,
   },
   {
     id: 3,
@@ -63,7 +63,7 @@ export const BUSES: BusDef[] = [
     category: 'load',
     x: 885,
     y: 150,
-    baseKV: 22.9,
+    baseKV: 154,
   },
   {
     id: 4,
@@ -73,7 +73,7 @@ export const BUSES: BusDef[] = [
     category: 'load',
     x: 885,
     y: 300,
-    baseKV: 22.9,
+    baseKV: 154,
   },
   {
     id: 5,
@@ -83,7 +83,7 @@ export const BUSES: BusDef[] = [
     category: 'load',
     x: 885,
     y: 450,
-    baseKV: 22.9,
+    baseKV: 154,
   },
 ];
 

@@ -175,19 +175,19 @@
 <p>실제 한국 전력계통은 여러 전압 레벨을 거쳐 전력을 전송합니다:</p>
 
 <div class="formula">발전기 출력단  ~20 kV  (발전기 단자전압)
-      |  [승압변압기 step-up]  20kV  --&gt; 154kV
+      |  [승압변압기 step-up]  20kV  --&gt; 345kV
 송전망         154 kV / 345 kV / 765 kV  (장거리 고압 송전)
-      |  [강압변압기 step-down]  154kV  --&gt; 22.9kV
-배전망         22.9 kV  (도시/지역 배전)
-      |  [주상변압기]
-수용가          220 / 380 V</div>
+      |  [강압변압기 step-down]  345kV  --&gt; 154kV
+1차 변전망      154 kV  (지역 변전소)
+      |  [강압변압기]  154kV --&gt; 22.9kV
+배전망         22.9 kV  →  수용가 220 / 380 V</div>
 
-<div class="warn-box"><strong>이 시뮬레이터의 단순화:</strong> 실제 계통에는 발전기 단자(~20kV)에서 송전망(154kV)으로 올리는 <strong>승압변압기(step-up TR)</strong>가 반드시 있습니다. 그러나 이 시뮬레이터는 교육 목적상 이 단계를 생략하고, Bus1(Slack)과 Bus2(PV)를 이미 154kV 레벨의 발전기 모선으로 가정합니다. 실계통에서는 발전소 내부에 154kV 모선이 있고 그 뒤에 송전선이 이어집니다.</div>
+<div class="warn-box"><strong>이 시뮬레이터의 단순화:</strong> 실제 계통에는 발전기 단자(~20kV)에서 송전망(345kV)으로 올리는 <strong>승압변압기(step-up TR)</strong>가 반드시 있습니다. 그러나 이 시뮬레이터는 교육 목적상 이 단계를 생략하고, Bus1(Slack)과 Bus2(PV)를 이미 <strong>345kV 송전 레벨</strong>의 발전기 모선으로 가정합니다. 변압기 TR을 거쳐 154kV로 강압되어 부하(Bus3·4·5)에 공급됩니다. 이렇게 두면 90MW 부하가 154kV에서 약 340A로, 실제 154kV 계통 전류와 유사해집니다.</div>
 
 <h3>실습 계통 구성 (실제 코드값)</h3>
-<div class="sys-diagram"><span class="gen">Bus1 (Slack Gen, 154kV)</span> --<span class="br">선로1 (0.01+j0.03)</span>--&gt; <span class="bus">Bus6 (집전, 154kV)</span>
-<span class="gen">Bus2 (PV Gen 50MW, 154kV)</span> -<span class="br">선로2 (0.01+j0.03)</span>-&gt; <span class="bus">Bus6</span>
-<span class="bus">Bus6</span> ==<span class="tr">변압기 TR (0.02+j0.10)</span>==&gt; <span class="bus">Bus7 (배전, 22.9kV)</span>
+<div class="sys-diagram"><span class="gen">Bus1 (Slack Gen, 345kV)</span> --<span class="br">선로1 (0.01+j0.03)</span>--&gt; <span class="bus">Bus6 (집전, 345kV)</span>
+<span class="gen">Bus2 (PV Gen 50MW, 345kV)</span> -<span class="br">선로2 (0.01+j0.03)</span>-&gt; <span class="bus">Bus6</span>
+<span class="bus">Bus6</span> ==<span class="tr">변압기 TR (0.02+j0.10)</span>==&gt; <span class="bus">Bus7 (변전, 154kV)</span>
 <span class="bus">Bus7</span> --<span class="br">선로4 (0.04+j0.15)</span>--&gt; <span class="ld">Bus3 (부하 30MW)</span>
 <span class="bus">Bus7</span> --<span class="br">선로5 (0.04+j0.15)</span>--&gt; <span class="ld">Bus4 (부하 25MW)</span>
 <span class="bus">Bus7</span> --<span class="br">선로6 (0.04+j0.15)</span>--&gt; <span class="ld">Bus5 (부하 35MW)</span></div>
@@ -209,11 +209,11 @@
 <div class="table-wrap"><table>
   <thead><tr><th>버스</th><th>전압 레벨</th><th>역할</th><th>비고</th></tr></thead>
   <tbody>
-    <tr><td>Bus1</td><td class="mono">154 kV</td><td>Slack 발전기</td><td>위상기준, 균형자</td></tr>
-    <tr><td>Bus2</td><td class="mono">154 kV</td><td>PV 발전기 (50MW)</td><td>AVR로 V=1.05 유지</td></tr>
-    <tr><td>Bus6</td><td class="mono">154 kV</td><td>집전 모선</td><td>양 발전기 전력 합류</td></tr>
-    <tr><td>Bus7</td><td class="mono">22.9 kV</td><td>배전 모선</td><td>TR 거쳐 강압</td></tr>
-    <tr><td>Bus3,4,5</td><td class="mono">22.9 kV</td><td>부하 모선</td><td>30/25/35 MW</td></tr>
+    <tr><td>Bus1</td><td class="mono">345 kV</td><td>Slack 발전기</td><td>위상기준, 균형자</td></tr>
+    <tr><td>Bus2</td><td class="mono">345 kV</td><td>PV 발전기 (50MW)</td><td>AVR로 V=1.05 유지</td></tr>
+    <tr><td>Bus6</td><td class="mono">345 kV</td><td>집전 모선</td><td>양 발전기 전력 합류</td></tr>
+    <tr><td>Bus7</td><td class="mono">154 kV</td><td>변전 모선</td><td>TR 거쳐 강압</td></tr>
+    <tr><td>Bus3,4,5</td><td class="mono">154 kV</td><td>부하 모선</td><td>30/25/35 MW</td></tr>
   </tbody>
 </table></div>
 </div>
@@ -224,13 +224,13 @@
 <div class="chapter-header"><div class="chapter-num">CH 02</div>
 <h2>퍼유닛(per-unit) 시스템<span class="en">Per-Unit System</span></h2></div>
 
-<p>전압등급이 다른 구간(이 계통은 154kV·22.9kV)을 실제 단위로 계산하면 변압기 권선비가 식을 복잡하게 만듭니다. pu는 각 구간 정격으로 무차원화해 변압기를 "투명"하게 만듭니다.</p>
+<p>전압등급이 다른 구간(이 계통은 345kV·154kV)을 실제 단위로 계산하면 변압기 권선비가 식을 복잡하게 만듭니다. pu는 각 구간 정격으로 무차원화해 변압기를 "투명"하게 만듭니다.</p>
 
 <div class="grid-2">
   <div class="card"><h4>전압 pu (구간마다 기준 다름)</h4>
     <div class="formula" style="font-size:12px;">V[pu] = V[kV] / V_base[kV]
-<span class="comment">// Bus1,2,6: base 154kV
-// Bus7,3,4,5: base 22.9kV
+<span class="comment">// Bus1,2,6: base 345kV
+// Bus7,3,4,5: base 154kV
 // 1.05pu --> 154x1.05 = 161.7kV</span></div></div>
   <div class="card"><h4>전력 pu (계통 전체 하나)</h4>
     <div class="formula" style="font-size:12px;">P[pu] = P[MW] / 100MVA
@@ -257,9 +257,9 @@
 <div class="table-wrap"><table>
   <thead><tr><th>선로</th><th>r (pu)</th><th>x (pu)</th><th>X/R</th><th>특성</th></tr></thead>
   <tbody>
-    <tr><td>선로1,2 (154kV 송전)</td><td class="mono">0.01</td><td class="mono">0.03</td><td class="mono">3.0</td><td>굵은 송전선, 저저항</td></tr>
-    <tr><td>변압기 TR (154/22.9kV)</td><td class="mono">0.02</td><td class="mono">0.10</td><td class="mono">5.0</td><td>누설리액턴스 큼 → X/R 최대</td></tr>
-    <tr><td>선로4,5,6 (22.9kV 배전)</td><td class="mono">0.04</td><td class="mono">0.15</td><td class="mono">3.75</td><td>가늘고 긴 배전선 → 임피던스 큼</td></tr>
+    <tr><td>선로1,2 (345kV 송전)</td><td class="mono">0.01</td><td class="mono">0.03</td><td class="mono">3.0</td><td>굵은 송전선, 저저항</td></tr>
+    <tr><td>변압기 TR (345/154kV)</td><td class="mono">0.02</td><td class="mono">0.10</td><td class="mono">5.0</td><td>누설리액턴스 큼 → X/R 최대</td></tr>
+    <tr><td>선로4,5,6 (154kV 부하선)</td><td class="mono">0.04</td><td class="mono">0.15</td><td class="mono">3.75</td><td>가늘고 긴 2차 선로 → 임피던스 큼</td></tr>
   </tbody>
 </table></div>
 
@@ -463,7 +463,7 @@ V_단자 &gt; V_set → 계자전류 I_f 감소 → E_q 감소 → <span class="
 <div class="formula">Bus2 (θ = +0.108°)  ← PV 발전기: 기준보다 앞섬 → 전력 주입
 Bus1 (θ =  0.000°)  ← Slack 기준
 Bus6 (θ = -0.564°)  ← 집전 모선
-Bus7 (θ = -5.313°)  ← 변압기 2차(배전)
+Bus7 (θ = -5.313°)  ← 변압기 2차(154kV 변전)
 Bus4 (θ = -7.399°)  ← 부하
 Bus3 (θ = -7.830°)  ← 부하
 Bus5 (θ = -8.266°)  ← 부하 최대 → 위상 최저
@@ -636,7 +636,7 @@ iter3 → iter4:  8.6e-7  → 2.0e-13 ≈ (8.6e-7)^2      (제곱 그대로!)
     <tr><td>Bus1 Slack</td><td class="mono green">1.0500</td><td class="mono">0.000</td><td class="mono">+43.83</td><td class="mono">+24.01</td></tr>
     <tr><td>Bus2 PV</td><td class="mono green">1.0500</td><td class="mono">+0.108</td><td class="mono">+50.00</td><td class="mono">+22.02</td></tr>
     <tr><td>Bus6 집전</td><td class="mono">1.0390</td><td class="mono">−0.564</td><td class="mono">0</td><td class="mono">0</td></tr>
-    <tr><td>Bus7 배전</td><td class="mono amber">0.9816</td><td class="mono">−5.313</td><td class="mono">0</td><td class="mono">0</td></tr>
+    <tr><td>Bus7 변전</td><td class="mono amber">0.9816</td><td class="mono">−5.313</td><td class="mono">0</td><td class="mono">0</td></tr>
     <tr><td>Bus3 부하</td><td class="mono amber">0.9525</td><td class="mono">−7.830</td><td class="mono">−30.00</td><td class="mono">−9.86</td></tr>
     <tr><td>Bus4 부하</td><td class="mono amber">0.9576</td><td class="mono">−7.399</td><td class="mono">−25.00</td><td class="mono">−8.22</td></tr>
     <tr><td>Bus5 부하</td><td class="mono rose">0.9473</td><td class="mono">−8.266</td><td class="mono">−35.00</td><td class="mono">−11.50</td></tr>
@@ -829,7 +829,7 @@ Bus5 |   0               0               0              <span class="amber">-1.6
 
 부하탈락 + 분산전원 증가:
    수용가(태양광) → 22.9 → 154 → 345 → 765 → 연계 타 변전소   (전력 역송)</div>
-<p>22.9kV단 분산전원이 지역 부하보다 많으면, 남는 전력이 변압기를 <strong>거꾸로</strong> 타고 상위전압으로 올라가 연계된 다른 변전소·지역으로 흐릅니다.</p>
+<p>22.9kV 배전단 분산전원이 지역 부하보다 많으면, 남는 전력이 변압기를 <strong>거꾸로</strong> 타고 상위전압으로 올라가 연계된 다른 변전소·지역으로 흐릅니다.</p>
 
 <div class="warn-box"><strong>실무 이슈:</strong> 역조류가 생기면 변압기 탭 절환, 보호계전기 정정, 전압조정 방향이 모두 <strong>양방향</strong>을 고려해야 합니다. 태양광 보급 확대로 배전계통의 핵심 과제가 되었습니다.</div>
 </div>

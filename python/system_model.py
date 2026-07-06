@@ -16,13 +16,13 @@ PV_BUS    = 2
 # ── 모선 정의 ─────────────────────────────────────────
 # type: 'slack' | 'pv' | 'pq'
 BUSES = [
-    {'id': 1, 'name': 'Bus 1', 'type': 'slack', 'baseKV': 154,  'vSet': 1.05},
-    {'id': 2, 'name': 'Bus 2', 'type': 'pv',    'baseKV': 154,  'vSet': 1.05},
-    {'id': 6, 'name': 'Bus 6', 'type': 'pq',    'baseKV': 154,  'vSet': 1.00},
-    {'id': 7, 'name': 'Bus 7', 'type': 'pq',    'baseKV': 22.9, 'vSet': 1.00},
-    {'id': 3, 'name': 'Bus 3', 'type': 'pq',    'baseKV': 22.9, 'vSet': 1.00},
-    {'id': 4, 'name': 'Bus 4', 'type': 'pq',    'baseKV': 22.9, 'vSet': 1.00},
-    {'id': 5, 'name': 'Bus 5', 'type': 'pq',    'baseKV': 22.9, 'vSet': 1.00},
+    {'id': 1, 'name': 'Bus 1', 'type': 'slack', 'baseKV': 345, 'vSet': 1.05},
+    {'id': 2, 'name': 'Bus 2', 'type': 'pv',    'baseKV': 345, 'vSet': 1.05},
+    {'id': 6, 'name': 'Bus 6', 'type': 'pq',    'baseKV': 345, 'vSet': 1.00},
+    {'id': 7, 'name': 'Bus 7', 'type': 'pq',    'baseKV': 154, 'vSet': 1.00},
+    {'id': 3, 'name': 'Bus 3', 'type': 'pq',    'baseKV': 154, 'vSet': 1.00},
+    {'id': 4, 'name': 'Bus 4', 'type': 'pq',    'baseKV': 154, 'vSet': 1.00},
+    {'id': 5, 'name': 'Bus 5', 'type': 'pq',    'baseKV': 154, 'vSet': 1.00},
 ]
 
 # ── 선로/변압기 정의 ──────────────────────────────────

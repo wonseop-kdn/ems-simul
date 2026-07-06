@@ -28,7 +28,7 @@ def run():
     print('='*60)
     print('  7-Bus EMS 시뮬레이터 — Python 엔진')
     print('  Bus-Branch 모델 / 기준용량 100 MVA')
-    print('  154kV 송전 → 22.9kV 배전')
+    print('  345kV 송전 → 154kV 변전')
     print('='*60)
 
     # ════════════════════════════════════════════════════
