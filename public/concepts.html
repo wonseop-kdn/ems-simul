@@ -185,12 +185,12 @@
 <div class="warn-box"><strong>이 시뮬레이터의 단순화:</strong> 실제 계통에는 발전기 단자(~20kV)에서 송전망(345kV)으로 올리는 <strong>승압변압기(step-up TR)</strong>가 반드시 있습니다. 그러나 이 시뮬레이터는 교육 목적상 이 단계를 생략하고, Bus1(Slack)과 Bus2(PV)를 이미 <strong>345kV 송전 레벨</strong>의 발전기 모선으로 가정합니다. 변압기 TR을 거쳐 154kV로 강압되어 부하(Bus3·4·5)에 공급됩니다. 이렇게 두면 90MW 부하가 154kV에서 약 340A로, 실제 154kV 계통 전류와 유사해집니다.</div>
 
 <h3>실습 계통 구성 (실제 코드값)</h3>
-<div class="sys-diagram"><span class="gen">Bus1 (Slack Gen, 345kV)</span> --<span class="br">선로1 (0.01+j0.03)</span>--&gt; <span class="bus">Bus6 (집전, 345kV)</span>
-<span class="gen">Bus2 (PV Gen 50MW, 345kV)</span> -<span class="br">선로2 (0.01+j0.03)</span>-&gt; <span class="bus">Bus6</span>
-<span class="bus">Bus6</span> ==<span class="tr">변압기 TR (0.02+j0.10)</span>==&gt; <span class="bus">Bus7 (변전, 154kV)</span>
-<span class="bus">Bus7</span> --<span class="br">선로4 (0.04+j0.15)</span>--&gt; <span class="ld">Bus3 (부하 30MW)</span>
-<span class="bus">Bus7</span> --<span class="br">선로5 (0.04+j0.15)</span>--&gt; <span class="ld">Bus4 (부하 25MW)</span>
-<span class="bus">Bus7</span> --<span class="br">선로6 (0.04+j0.15)</span>--&gt; <span class="ld">Bus5 (부하 35MW)</span></div>
+<div class="sys-diagram"><span class="gen">Bus1 (Slack Gen, 345kV)</span> --<span class="br">선로1 (0.0015+j0.015)</span>--&gt; <span class="bus">Bus6 (집전, 345kV)</span>
+<span class="gen">Bus2 (PV Gen 50MW, 345kV)</span> -<span class="br">선로2 (0.0015+j0.015)</span>-&gt; <span class="bus">Bus6</span>
+<span class="bus">Bus6</span> ==<span class="tr">변압기 TR (0.001+j0.04)</span>==&gt; <span class="bus">Bus7 (변전, 154kV)</span>
+<span class="bus">Bus7</span> --<span class="br">선로4 (0.02+j0.10)</span>--&gt; <span class="ld">Bus3 (부하 30MW)</span>
+<span class="bus">Bus7</span> --<span class="br">선로5 (0.02+j0.10)</span>--&gt; <span class="ld">Bus4 (부하 25MW)</span>
+<span class="bus">Bus7</span> --<span class="br">선로6 (0.02+j0.10)</span>--&gt; <span class="ld">Bus5 (부하 35MW)</span></div>
 
 <div class="grid-2" style="margin-top:16px;">
   <div>
@@ -200,8 +200,8 @@
   </div>
   <div>
     <span class="tag tag-purple">V_set = 1.05 pu</span>
-    <span class="tag tag-green">총발전 = 93.83 MW</span>
-    <span class="tag tag-rose">총손실 = 3.825 MW</span>
+    <span class="tag tag-green">총발전 = 90.74 MW</span>
+    <span class="tag tag-rose">총손실 = 0.74 MW</span>
   </div>
 </div>
 
@@ -257,18 +257,18 @@
 <div class="table-wrap"><table>
   <thead><tr><th>선로</th><th>r (pu)</th><th>x (pu)</th><th>X/R</th><th>특성</th></tr></thead>
   <tbody>
-    <tr><td>선로1,2 (345kV 송전)</td><td class="mono">0.01</td><td class="mono">0.03</td><td class="mono">3.0</td><td>굵은 송전선, 저저항</td></tr>
-    <tr><td>변압기 TR (345/154kV)</td><td class="mono">0.02</td><td class="mono">0.10</td><td class="mono">5.0</td><td>누설리액턴스 큼 → X/R 최대</td></tr>
-    <tr><td>선로4,5,6 (154kV 부하선)</td><td class="mono">0.04</td><td class="mono">0.15</td><td class="mono">3.75</td><td>가늘고 긴 2차 선로 → 임피던스 큼</td></tr>
+    <tr><td>선로1,2 (345kV 송전)</td><td class="mono">0.0015</td><td class="mono">0.015</td><td class="mono">10</td><td>굵은 송전선, 저저항</td></tr>
+    <tr><td>변압기 TR (345/154kV)</td><td class="mono">0.001</td><td class="mono">0.04</td><td class="mono">40</td><td>누설리액턴스 큼 → X/R 최대</td></tr>
+    <tr><td>선로4,5,6 (154kV 부하선)</td><td class="mono">0.02</td><td class="mono">0.10</td><td class="mono">5</td><td>가늘고 긴 2차 선로 → 임피던스 큼</td></tr>
   </tbody>
 </table></div>
 
 <h3>어드미턴스 = r+jx 통째로의 복소수 역수</h3>
 <div class="formula">y = 1/(r+jx) = (r - jx)/(r^2+x^2) = g + jb
 
-선로1: 1/(0.01+j0.03) = (0.01-j0.03)/0.001  = <span class="green">10.00 - j30.00</span>
-TR  : 1/(0.02+j0.10) = (0.02-j0.10)/0.0104 = <span class="purple">1.92 - j9.62</span>
-선로4: 1/(0.04+j0.15) = (0.04-j0.15)/0.0241 = <span class="amber">1.66 - j6.22</span></div>
+선로1: 1/(0.0015+j0.015) = (0.0015-j0.015)/0.00022725 = <span class="green">6.60 - j66.01</span>
+TR  : 1/(0.001+j0.04)  = (0.001-j0.04)/0.0016010  = <span class="purple">0.62 - j24.98</span>
+선로4: 1/(0.02+j0.10)   = (0.02-j0.10)/0.0104     = <span class="amber">1.92 - j9.62</span></div>
 <p>네, "통째로를 각각 역수"가 맞습니다. 단 복소수 역수이므로 분모를 유리화(r²+x²로 나눔)합니다.</p>
 </div>
 
@@ -279,14 +279,14 @@ TR  : 1/(0.02+j0.10) = (0.02-j0.10)/0.0104 = <span class="purple">1.92 - j9.62</
 <h2>Y<sub>bus</sub> 행렬 — KCL 유도와 부호 규칙<span class="en">Bus Admittance Matrix</span></h2></div>
 
 <h3>대각항 = "연결된 모든 선로 어드미턴스의 합"</h3>
-<div class="formula">Y11 = 10-j30                                  (Bus1엔 선로1 하나만)
-Y66 = (10-j30)+(10-j30)+(1.92-j9.62) = <span class="accent">21.92 - j69.62</span>   (선로1+2+TR)
-Y77 = (1.92-j9.62)+3x(1.66-j6.22)    = <span class="accent">6.90 - j28.29</span>   (TR+선로4+5+6)</div>
+<div class="formula">Y11 = 6.60-j66.01                                  (Bus1엔 선로1 하나만)
+Y66 = (6.60-j66.01)+(6.60-j66.01)+(0.62-j24.98) = <span class="accent">13.83 - j157.00</span>   (선로1+2+TR)
+Y77 = (0.62-j24.98)+3x(1.92-j9.62)    = <span class="accent">6.39 - j53.83</span>   (TR+선로4+5+6)</div>
 
-<h3>비대각항 Y₁₆ = −10+j30 은 왜 "부호 반대"인가?</h3>
+<h3>비대각항 Y₁₆ = −6.60+j66.01 은 왜 "부호 반대"인가?</h3>
 <p>정확한 규칙은 <strong>"두 모선 사이 선로 어드미턴스의 부호 반전"</strong>입니다:</p>
-<div class="formula">Y16 = -(1-6 사이 선로 어드미턴스) = -(10-j30) = <span class="green">-10 + j30</span></div>
-<div class="warn-box"><strong>오해 주의:</strong> Y16이 마치 −Y11처럼 보이는 건 <strong>우연</strong>입니다. 모선1은 선로가 딱 하나라 Y11 = 그 선로값이 되어 그렇게 보일 뿐. 모선6은 다릅니다 — Y66 = 21.92−j69.62 이지만 Y16 = −10+j30 ≠ −Y66. 항상 <strong>선로</strong> 어드미턴스 기준입니다.</div>
+<div class="formula">Y16 = -(1-6 사이 선로 어드미턴스) = -(6.60-j66.01) = <span class="green">-6.60 + j66.01</span></div>
+<div class="warn-box"><strong>오해 주의:</strong> Y16이 마치 −Y11처럼 보이는 건 <strong>우연</strong>입니다. 모선1은 선로가 딱 하나라 Y11 = 그 선로값이 되어 그렇게 보일 뿐. 모선6은 다릅니다 — Y66 = 13.83−j157.00 이지만 Y16 = −6.60+j66.01 ≠ −Y66. 항상 <strong>선로</strong> 어드미턴스 기준입니다.</div>
 
 <h3>왜 부호를 반대로? — KCL(전류법칙) 유도</h3>
 <div class="formula">모선 i 주입전류:  I_i = Sum_j y_ij*(V_i - V_j)      (이웃 j로 흐르는 전류 합)
@@ -299,13 +299,13 @@ Y77 = (1.92-j9.62)+3x(1.66-j6.22)    = <span class="accent">6.90 - j28.29</span>
 
 <h3>전체 Y<sub>bus</sub> (실제 엔진 출력)</h3>
 <div class="formula" style="font-size:11px;">        B1       B2       B6       B7       B3       B4       B5
-B1   10-30j     .     -10+30j     .        .        .        .
-B2      .    10-30j  -10+30j      .        .        .        .
-B6  -10+30j  -10+30j 21.9-69.6j -1.9+9.6j   .        .        .
-B7      .        .   -1.9+9.6j  6.9-28.3j -1.7+6.2j -1.7+6.2j -1.7+6.2j
-B3      .        .        .    -1.7+6.2j  1.7-6.2j    .        .
-B4      .        .        .    -1.7+6.2j    .     1.7-6.2j     .
-B5      .        .        .    -1.7+6.2j    .        .     1.7-6.2j
+B1  6.6-66j      .     -6.6+66j    .        .        .        .
+B2      .    6.6-66j   -6.6+66j    .        .        .        .
+B6  -6.6+66j  -6.6+66j 13.8-157j -0.6+25j    .        .        .
+B7      .        .    -0.6+25j  6.4-53.8j -1.9+9.6j -1.9+9.6j -1.9+9.6j
+B3      .        .        .    -1.9+9.6j  1.9-9.6j    .        .
+B4      .        .        .    -1.9+9.6j    .     1.9-9.6j     .
+B5      .        .        .    -1.9+9.6j    .        .     1.9-9.6j
 <span class="comment">  ( . = 0 = 직접 연결 없음.  대각 = 연결선 합, 비대각 = -선로값 )</span></div>
 </div>
 
@@ -317,43 +317,43 @@ B5      .        .        .    -1.7+6.2j    .        .     1.7-6.2j
 
 <p>행렬 위치 인덱스(이 계통 기준): <strong>1=Bus1, 2=Bus2, 3=Bus6, 4=Bus7, 5=Bus3, 6=Bus4, 7=Bus5</strong></p>
 
-<h3>Y₁₃ = −10+j30 은 어떻게 나오나? (Bus1 행, Bus6 열)</h3>
+<h3>Y₁₃ = −6.60+j66.01 은 어떻게 나오나? (Bus1 행, Bus6 열)</h3>
 
 <div class="card no-break">
   <h4>단계 1 — 두 버스가 직접 연결돼 있나?</h4>
-  <p style="margin:8px 0;">Bus1 ↔ Bus6: <span class="green">선로1 (r=0.01, x=0.03)으로 연결됨</span></p>
+  <p style="margin:8px 0;">Bus1 ↔ Bus6: <span class="green">선로1 (r=0.0015, x=0.015)으로 연결됨</span></p>
 
   <h4>단계 2 — 그 선로의 어드미턴스 계산</h4>
-  <div class="formula" style="margin:8px 0;">y_16 = 1/(r+jx) = 1/(0.01+j0.03)
+  <div class="formula" style="margin:8px 0;">y_16 = 1/(r+jx) = 1/(0.0015+j0.015)
 
-분자·분모에 켤레복소수 (0.01-j0.03) 곱하기:
-     (0.01-j0.03)           (0.01-j0.03)
-= ─────────────────── = ─────────────────
-  (0.01+j0.03)(0.01-j0.03)   0.01^2+0.03^2
+분자·분모에 켤레복소수 (0.0015-j0.015) 곱하기:
+     (0.0015-j0.015)              (0.0015-j0.015)
+= ─────────────────────────── = ─────────────────
+  (0.0015+j0.015)(0.0015-j0.015)   0.0015^2+0.015^2
 
-분모 = 0.0001 + 0.0009 = 0.001
+분모 = 0.00000225 + 0.000225 = 0.00022725
 
-= (0.01-j0.03) / 0.001 = <span class="green">10 - j30</span></div>
+= (0.0015-j0.015) / 0.00022725 = <span class="green">6.60 - j66.01</span></div>
 
   <h4>단계 3 — 비대각 항 = 부호 반전</h4>
-  <div class="formula" style="margin:8px 0;">Y16 = Y13 = -y_16 = -(10-j30) = <span class="rose">-10 + j30</span>  ✓</div>
+  <div class="formula" style="margin:8px 0;">Y16 = Y13 = -y_16 = -(6.60-j66.01) = <span class="rose">-6.60 + j66.01</span>  ✓</div>
 </div>
 
-<h3>Y₃₄ = −1.92+j9.62 은 어떻게 나오나? (Bus6 행, Bus7 열)</h3>
+<h3>Y₃₄ = −0.62+j24.98 은 어떻게 나오나? (Bus6 행, Bus7 열)</h3>
 
 <div class="card no-break">
   <h4>단계 1 — 두 버스가 직접 연결돼 있나?</h4>
-  <p style="margin:8px 0;">Bus6 ↔ Bus7: <span class="green">변압기 TR (r=0.02, x=0.10)으로 연결됨</span></p>
+  <p style="margin:8px 0;">Bus6 ↔ Bus7: <span class="green">변압기 TR (r=0.001, x=0.04)으로 연결됨</span></p>
 
   <h4>단계 2 — 어드미턴스 계산</h4>
-  <div class="formula" style="margin:8px 0;">y_67 = 1/(0.02+j0.10)
+  <div class="formula" style="margin:8px 0;">y_67 = 1/(0.001+j0.04)
 
-분모 = 0.02^2 + 0.10^2 = 0.0004 + 0.01 = 0.0104
+분모 = 0.001^2 + 0.04^2 = 0.000001 + 0.0016 = 0.0016010
 
-= (0.02-j0.10) / 0.0104 = <span class="purple">1.92 - j9.62</span></div>
+= (0.001-j0.04) / 0.0016010 = <span class="purple">0.62 - j24.98</span></div>
 
   <h4>단계 3 — 비대각 항 = 부호 반전</h4>
-  <div class="formula" style="margin:8px 0;">Y67 = Y34 = -y_67 = -(1.92-j9.62) = <span class="rose">-1.92 + j9.62</span>  ✓</div>
+  <div class="formula" style="margin:8px 0;">Y67 = Y34 = -y_67 = -(0.62-j24.98) = <span class="rose">-0.62 + j24.98</span>  ✓</div>
 </div>
 
 <div class="highlight-box">
@@ -366,16 +366,16 @@ B5      .        .        .    -1.7+6.2j    .        .     1.7-6.2j
 <div class="table-wrap"><table>
   <thead><tr><th>행렬 위치</th><th>실제 버스</th><th>연결 선로</th><th>r</th><th>x</th><th>r²+x²</th><th>결과</th></tr></thead>
   <tbody>
-    <tr><td class="mono">Y₁₃</td><td>Bus1↔Bus6</td><td>선로1</td><td class="mono">0.01</td><td class="mono">0.03</td><td class="mono">0.001</td><td class="mono green">−10+j30</td></tr>
-    <tr><td class="mono">Y₂₃</td><td>Bus2↔Bus6</td><td>선로2</td><td class="mono">0.01</td><td class="mono">0.03</td><td class="mono">0.001</td><td class="mono green">−10+j30</td></tr>
-    <tr><td class="mono">Y₃₄</td><td>Bus6↔Bus7</td><td>TR</td><td class="mono">0.02</td><td class="mono">0.10</td><td class="mono">0.0104</td><td class="mono purple">−1.92+j9.62</td></tr>
-    <tr><td class="mono">Y₄₅</td><td>Bus7↔Bus3</td><td>선로4</td><td class="mono">0.04</td><td class="mono">0.15</td><td class="mono">0.0241</td><td class="mono amber">−1.66+j6.22</td></tr>
-    <tr><td class="mono">Y₄₆</td><td>Bus7↔Bus4</td><td>선로5</td><td class="mono">0.04</td><td class="mono">0.15</td><td class="mono">0.0241</td><td class="mono amber">−1.66+j6.22</td></tr>
-    <tr><td class="mono">Y₄₇</td><td>Bus7↔Bus5</td><td>선로6</td><td class="mono">0.04</td><td class="mono">0.15</td><td class="mono">0.0241</td><td class="mono amber">−1.66+j6.22</td></tr>
+    <tr><td class="mono">Y₁₃</td><td>Bus1↔Bus6</td><td>선로1</td><td class="mono">0.0015</td><td class="mono">0.015</td><td class="mono">0.00022725</td><td class="mono green">−6.60+j66.01</td></tr>
+    <tr><td class="mono">Y₂₃</td><td>Bus2↔Bus6</td><td>선로2</td><td class="mono">0.0015</td><td class="mono">0.015</td><td class="mono">0.00022725</td><td class="mono green">−6.60+j66.01</td></tr>
+    <tr><td class="mono">Y₃₄</td><td>Bus6↔Bus7</td><td>TR</td><td class="mono">0.001</td><td class="mono">0.04</td><td class="mono">0.0016010</td><td class="mono purple">−0.62+j24.98</td></tr>
+    <tr><td class="mono">Y₄₅</td><td>Bus7↔Bus3</td><td>선로4</td><td class="mono">0.02</td><td class="mono">0.10</td><td class="mono">0.0104</td><td class="mono amber">−1.92+j9.62</td></tr>
+    <tr><td class="mono">Y₄₆</td><td>Bus7↔Bus4</td><td>선로5</td><td class="mono">0.02</td><td class="mono">0.10</td><td class="mono">0.0104</td><td class="mono amber">−1.92+j9.62</td></tr>
+    <tr><td class="mono">Y₄₇</td><td>Bus7↔Bus5</td><td>선로6</td><td class="mono">0.02</td><td class="mono">0.10</td><td class="mono">0.0104</td><td class="mono amber">−1.92+j9.62</td></tr>
     <tr><td class="mono">나머지</td><td>연결 없음</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="mono subtext">0</td></tr>
   </tbody>
 </table></div>
-<p style="font-size:12px; color:var(--subtext);">선로4·5·6이 같은 임피던스(0.04+j0.15)를 써서 Y₄₅=Y₄₆=Y₄₇이 모두 동일합니다.</p>
+<p style="font-size:12px; color:var(--subtext);">선로4·5·6이 같은 임피던스(0.02+j0.10)를 써서 Y₄₅=Y₄₆=Y₄₇이 모두 동일합니다.</p>
 </div>
 
 
@@ -421,11 +421,11 @@ B5      .        .        .    -1.7+6.2j    .        .     1.7-6.2j
   <strong>왜 PV는 P를 고정할 수 있나?</strong> 실제 발전기는 운전원이 "이 발전기 60MW로 돌려"라고 출력 지령(거버너 설정)을 내립니다. 단 한 대(Slack)만은 손실까지 메우느라 P를 비워두는 것이고, 나머지 발전기는 전부 PV로 P를 지정합니다. 그래서 <strong>발전기 N대 = Slack 1대 + PV (N−1)대</strong>가 일반적인 구성입니다.
 </div>
 
-<p><strong>"왜 Q는 고정 안 하나?"</strong> 발전기에는 AVR(자동전압조정기)이 달려 있어서, 전압을 1.05pu로 유지하기 위해 <strong>무효전력 Q를 실시간으로 자동 조절</strong>합니다. 즉 Q는 운전원이 정하는 게 아니라 "전압을 맞추다 보니 결정되는" 종속 변수입니다. 이 계통에서 Bus2는 V=1.05pu를 지키느라 Q=+22.02Mvar을 자동 공급하는 것으로 풀립니다.</p>
+<p><strong>"왜 Q는 고정 안 하나?"</strong> 발전기에는 AVR(자동전압조정기)이 달려 있어서, 전압을 1.05pu로 유지하기 위해 <strong>무효전력 Q를 실시간으로 자동 조절</strong>합니다. 즉 Q는 운전원이 정하는 게 아니라 "전압을 맞추다 보니 결정되는" 종속 변수입니다. 이 계통에서 Bus2는 V=1.05pu를 지키느라 Q=+15.0Mvar을 자동 공급하는 것으로 풀립니다.</p>
 
 <div class="grid-2">
   <div class="card"><h4>Bus2 지정값</h4><ul><li>P = <span class="green">50 MW</span></li><li>V = <span class="accent">1.05 pu</span></li></ul></div>
-  <div class="card"><h4>Bus2 해석이 결정</h4><ul><li>θ = <span class="amber">+0.108°</span></li><li>Q = <span class="amber">+22.02 Mvar</span></li></ul></div>
+  <div class="card"><h4>Bus2 해석이 결정</h4><ul><li>θ = <span class="amber">+0.073°</span></li><li>Q = <span class="amber">+15.0 Mvar</span></li></ul></div>
 </div>
 
 <h3>AVR이 Q를 조절하는 원리</h3>
@@ -460,16 +460,16 @@ V_단자 &gt; V_set → 계자전류 I_f 감소 → E_q 감소 → <span class="
 
 <p>전류는 위상이 <strong>앞선 곳(θ 큰 곳) → 뒤진 곳(θ 작은 곳)</strong>으로 흐릅니다. Slack(Bus1)을 0°로 고정한 <strong>실제 수렴 결과</strong>:</p>
 
-<div class="formula">Bus2 (θ = +0.108°)  ← PV 발전기: 기준보다 앞섬 → 전력 주입
+<div class="formula">Bus2 (θ = +0.073°)  ← PV 발전기: 기준보다 앞섬 → 전력 주입
 Bus1 (θ =  0.000°)  ← Slack 기준
-Bus6 (θ = -0.564°)  ← 집전 모선
-Bus7 (θ = -5.313°)  ← 변압기 2차(154kV 변전)
-Bus4 (θ = -7.399°)  ← 부하
-Bus3 (θ = -7.830°)  ← 부하
-Bus5 (θ = -8.266°)  ← 부하 최대 → 위상 최저
-<span class="comment">  전력은 위상 "내리막"으로 흐른다: 발전(+0.1°) → 부하끝단(-8.3°)</span></div>
+Bus6 (θ = -0.304°)  ← 집전 모선
+Bus7 (θ = -2.208°)  ← 변압기 2차(154kV 변전)
+Bus4 (θ = -3.479°)  ← 부하
+Bus3 (θ = -3.737°)  ← 부하
+Bus5 (θ = -3.997°)  ← 부하 최대 → 위상 최저
+<span class="comment">  전력은 위상 "내리막"으로 흐른다: 발전(+0.1°) → 부하끝단(-4.0°)</span></div>
 
-<div class="highlight-box"><strong>변압기에서 각도가 크게 꺾이는 이유:</strong> TR의 리액턴스(x=0.10)가 선로보다 커서 Bus6(−0.56°)→Bus7(−5.31°)에서 약 4.7° 급강하합니다. 위상차가 클수록 그 설비로 많은 유효전력이 통과한다는 뜻 (TR에 전 부하 90MW 집중).</div>
+<div class="highlight-box"><strong>변압기에서 각도가 크게 꺾이는 이유:</strong> TR의 리액턴스(x=0.04)가 선로보다 커서 Bus6(−0.30°)→Bus7(−2.21°)에서 약 1.9° 급강하합니다. 위상차가 클수록 그 설비로 많은 유효전력이 통과한다는 뜻 (TR에 전 부하 90MW 집중).</div>
 
 <div class="formula">P_ij ≈ (V_i * V_j / X_ij) * sin(θ_i - θ_j)
 <span class="comment">  각도차 ↑ → 전송 유효전력 ↑.  실계통에서 30° 이상이면 안정도 위험.</span></div>
@@ -498,8 +498,8 @@ X >> R 이므로:  ΔV ≈ <span class="amber">Q*X / V</span>   (Q가 지배!)
 <div class="table-wrap"><table>
   <thead><tr><th>모선</th><th>Q (Mvar)</th><th>역할</th></tr></thead>
   <tbody>
-    <tr><td>Bus1 Slack</td><td class="mono amber">+24.01</td><td>전압기준 유지 + Q 균형</td></tr>
-    <tr><td>Bus2 PV</td><td class="mono amber">+22.02</td><td>AVR로 V=1.05 유지</td></tr>
+    <tr><td>Bus1 Slack</td><td class="mono amber">+18.0</td><td>전압기준 유지 + Q 균형</td></tr>
+    <tr><td>Bus2 PV</td><td class="mono amber">+15.0</td><td>AVR로 V=1.05 유지</td></tr>
     <tr><td>Bus3 부하</td><td class="mono rose">−9.86</td><td>Q 소비 (PF 0.95)</td></tr>
     <tr><td>Bus4 부하</td><td class="mono rose">−8.22</td><td>Q 소비</td></tr>
     <tr><td>Bus5 부하</td><td class="mono rose">−11.50</td><td>Q 소비 (최대)</td></tr>
@@ -549,7 +549,7 @@ G_ij, B_ij = Ybus의 실수부·허수부   ← r, x의 역수로 만든 값
   V6=V7=V3=V4=V5=1.00 ← 나머지는 1.0으로 가정
   θ1=θ2=θ6=θ7=θ3=θ4=θ5 = 0°  ← 모든 위상각 0으로 가정</div>
 
-<h3>4) mismatch란? (b=30 유도 포함)</h3>
+<h3>4) mismatch란? (b=66 유도 포함)</h3>
 <p>NR은 <strong>"우리가 원하는 전력(P_spec, Q_spec)"</strong>과 <strong>"현재 추정한 전압으로 계산한 전력(P_calc, Q_calc)"</strong>의 차이를 줄여나가는 과정입니다.</p>
 <div class="formula">mismatch = P_spec - P_calc(V, θ)
            Q_spec - Q_calc(V, θ)
@@ -564,26 +564,26 @@ G_ij, B_ij = Ybus의 실수부·허수부   ← r, x의 역수로 만든 값
 <div class="formula">Q_calc_i = -Vi x Sum_j(Vj x B_ij)     (모든 θ=0일 때 sin=0이라 G항 사라짐)
 
 Bus6에 대해 계산:
-  B61=+30,  B62=+30,  B66=-69.62,  B67=+9.62   (Ybus B행렬에서)
+  B61=+66.01,  B62=+66.01,  B66=-157.00,  B67=+24.98   (Ybus B행렬에서)
 
-  Sum = V1*30 + V2*30 + V6*(-69.62) + V7*9.62
-      = 1.05*30 + 1.05*30 + 1.00*(-69.62) + 1.00*9.62
-      = 31.50   + 31.50   - 69.62          + 9.62
-      = <span class="rose">3.00</span>
+  Sum = V1*66.01 + V2*66.01 + V6*(-157.00) + V7*24.98
+      = 1.05*66.01 + 1.05*66.01 + 1.00*(-157.00) + 1.00*24.98
+      = 69.31   + 69.31   - 157.00          + 24.98
+      = <span class="rose">6.60</span>
 
-  Q_calc_6 = -1.00 x 3.00 = -3.00 pu
+  Q_calc_6 = -1.00 x 6.60 = -6.60 pu
 
   Q_spec_6 = 0  (Bus6은 부하·발전 없는 집전모선 → Q = 0 이어야 함)
 
-  ΔQ6 = Q_spec - Q_calc = 0 - (-3.00) = <span class="rose">+3.00 pu</span>  ← max mismatch!</div>
+  ΔQ6 = Q_spec - Q_calc = 0 - (-6.60) = <span class="rose">+6.60 pu</span>  ← max mismatch!</div>
 
 <div class="warn-box">
-  <strong>왜 Bus6의 ΔQ가 가장 클까? — 그리고 B=30은 어디서 나오나?</strong><br/>
-  선로 1·2는 r=0.01, x=0.03으로 정의되어 있습니다. 서셉턴스는 다음과 같이 계산됩니다:
-  <div class="formula" style="margin:8px 0;">b = -x / (r^2+x^2) = -0.03 / (0.0001+0.0009) = -0.03 / 0.001 = <span class="rose">-30</span>
-Ybus 비대각 원소 B61 = -b = <span class="accent">+30</span>  (선로 어드미턴스의 부호 반전)</div>
-  Bus6은 발전기(1.05pu)와 나머지 계통(1.0pu) 사이의 집전모선입니다. 전압 단차(1.05−1.00=0.05pu)와 B=30이 곱해지면:
-  <div class="formula" style="margin:8px 0;">ΔQ6 ≈ 전압단차 x B x 발전기수 = 0.05 x 30 x 2 = <span class="rose">3.0 pu</span></div>
+  <strong>왜 Bus6의 ΔQ가 가장 클까? — 그리고 B=66은 어디서 나오나?</strong><br/>
+  선로 1·2는 r=0.0015, x=0.015로 정의되어 있습니다. 서셉턴스는 다음과 같이 계산됩니다:
+  <div class="formula" style="margin:8px 0;">b = -x / (r^2+x^2) = -0.015 / (0.00000225+0.000225) = -0.015 / 0.00022725 = <span class="rose">-66.01</span>
+Ybus 비대각 원소 B61 = -b = <span class="accent">+66.01</span>  (선로 어드미턴스의 부호 반전)</div>
+  Bus6은 발전기(1.05pu)와 나머지 계통(1.0pu) 사이의 집전모선입니다. 전압 단차(1.05−1.00=0.05pu)와 B=66이 곱해지면:
+  <div class="formula" style="margin:8px 0;">ΔQ6 ≈ 전압단차 x B x 발전기수 = 0.05 x 66 x 2 = <span class="rose">6.60 pu</span></div>
   선로 임피던스가 작을수록(=B가 클수록) 이 초기 불일치가 커집니다.
 </div>
 
@@ -598,18 +598,18 @@ J = [∂P/∂θ  ∂P/∂V]   ← 전압/각도를 조금 바꿀 때 P가 얼마
 → 전압/각도 갱신: θ ← θ + Δθ,  V ← V + ΔV</div>
 
 <h3>6) 수렴 추이 표 (iter 0~4)</h3>
-<div class="nr-row"><span class="it">iter 0</span><div class="bar-wrap"><div class="bar" style="width:100%;background:var(--rose)"></div></div><span class="val rose">3.000e+0 pu = 300 MW &nbsp;(ΔQ at Bus6)</span></div>
-<div class="nr-row"><span class="it">iter 1</span><div class="bar-wrap"><div class="bar" style="width:6%;background:var(--amber)"></div></div><span class="val amber">1.759e-1 pu = 17.6 MW &nbsp;(ΔQ at Bus6)</span></div>
-<div class="nr-row"><span class="it">iter 2</span><div class="bar-wrap"><div class="bar" style="width:1%"></div></div><span class="val green">1.517e-3 pu = 0.15 MW &nbsp;(ΔP at Bus7)</span></div>
-<div class="nr-row"><span class="it">iter 3</span><div class="bar-wrap"><div class="bar" style="width:1%"></div></div><span class="val green">8.614e-7 pu = 0.00009 MW &nbsp;(ΔP at Bus7)</span></div>
-<div class="nr-row"><span class="it">iter 4</span><div class="bar-wrap"><div class="bar" style="width:1%"></div></div><span class="val green">2.020e-13 pu → 수렴 완료 ✓</span></div>
+<div class="nr-row"><span class="it">iter 0</span><div class="bar-wrap"><div class="bar" style="width:100%;background:var(--rose)"></div></div><span class="val rose">6.601e+0 pu = 660 MW &nbsp;(ΔQ at Bus6)</span></div>
+<div class="nr-row"><span class="it">iter 1</span><div class="bar-wrap"><div class="bar" style="width:6%;background:var(--amber)"></div></div><span class="val amber">3.629e-1 pu = 36.3 MW &nbsp;(ΔQ at Bus6)</span></div>
+<div class="nr-row"><span class="it">iter 2</span><div class="bar-wrap"><div class="bar" style="width:1%"></div></div><span class="val green">1.071e-3 pu = 0.11 MW &nbsp;(ΔQ at Bus6)</span></div>
+<div class="nr-row"><span class="it">iter 3</span><div class="bar-wrap"><div class="bar" style="width:1%"></div></div><span class="val green">1.351e-8 pu &nbsp;(ΔQ at Bus6)</span></div>
+<div class="nr-row"><span class="it">iter 4</span><div class="bar-wrap"><div class="bar" style="width:1%"></div></div><span class="val green">4.834e-14 pu → 수렴 완료 ✓</span></div>
 
 <div class="highlight-box">
-  <strong>왜 iter0·1은 "ΔQ at Bus6", iter2부터는 "ΔP at Bus7"로 바뀌나?</strong><br/>
+  <strong>왜 모든 반복에서 "ΔQ at Bus6"가 최대인가?</strong><br/>
   maxMismatch는 <strong>매 반복마다 "지금 가장 안 맞는 곳"</strong>을 가리킵니다.
   <ul style="margin:6px 0 0 0; padding-left:18px;">
-    <li><strong>iter0·1:</strong> flat start 직후엔 발전기(1.05pu)와 집전모선(1.0pu)의 전압 단차 때문에 <strong>Bus6의 무효전력(Q)</strong>이 가장 안 맞음 → ΔQ6가 최대 (3.00 → 0.176).</li>
-    <li><strong>iter2 이후:</strong> 전압 크기는 거의 자리잡혔고, 이제 <strong>위상각(θ)이 결정하는 유효전력(P)</strong>의 미세한 오차가 남음. 부하가 먼 Bus7쪽 ΔP가 마지막까지 남아 최대가 됨.</li>
+    <li><strong>iter0·1:</strong> flat start 직후엔 발전기(1.05pu)와 집전모선(1.0pu)의 전압 단차 때문에 <strong>Bus6의 무효전력(Q)</strong>이 가장 안 맞음 → ΔQ6가 최대 (6.601 → 0.363).</li>
+    <li><strong>iter2 이후:</strong> 이번 계통은 선로 서셉턴스가 매우 큽니다(b=66). 서셉턴스가 클수록 무효전력이 전압 오차에 민감하게 반응하므로, 위상각·전압이 거의 자리잡은 뒤에도 <strong>Bus6의 Q가 가장 빡빡한 제약</strong>으로 남습니다. 그래서 수렴이 끝날 때까지 최대 mismatch는 계속 ΔQ@Bus6입니다 (더 이상 ΔP@Bus7로 바뀌지 않음).</li>
   </ul>
 </div>
 
@@ -617,12 +617,12 @@ J = [∂P/∂θ  ∂P/∂V]   ← 전압/각도를 조금 바꿀 때 P가 얼마
 <p>뉴턴법은 오차가 매 반복마다 <strong>제곱</strong>으로 줄어드는 특성이 있습니다. 이를 이차수렴(quadratic convergence)이라 합니다.</p>
 <div class="formula">오차가 e이면, 다음 반복 후 오차 ≈ k x e^2
 
-iter0 → iter1:  3.000 →  0.176   (58배 감소)
-iter1 → iter2:  0.176 →  0.00152 ≈ 0.176^2 x 0.049  (116배)
-iter2 → iter3:  0.00152 → 8.6e-7  ≈ 0.00152^2        (1770배)
-iter3 → iter4:  8.6e-7  → 2.0e-13 ≈ (8.6e-7)^2      (제곱 그대로!)
+iter0 → iter1:  6.601 →  0.363   (18배 감소)
+iter1 → iter2:  0.363 →  0.00107 ≈ 0.363^2 x 0.008  (339배)
+iter2 → iter3:  0.00107 → 1.35e-8 ≈ 0.00107^2        (79000배)
+iter3 → iter4:  1.35e-8 → 4.8e-14 ≈ (1.35e-8)^2      (제곱 그대로!)
 
-유효 자릿수:  1자리 → 1자리 → 3자리 → 6자리 → 13자리
+유효 자릿수:  1자리 → 1자리 → 3자리 → 8자리 → 13자리
                               ↑ 2배씩 늘어남 = 이차수렴</div>
 
 <div class="highlight-box">
@@ -633,16 +633,16 @@ iter3 → iter4:  8.6e-7  → 2.0e-13 ≈ (8.6e-7)^2      (제곱 그대로!)
 <div class="table-wrap"><table>
   <thead><tr><th>모선</th><th>V (pu)</th><th>θ (°)</th><th>P주입 (MW)</th><th>Q주입 (Mvar)</th></tr></thead>
   <tbody>
-    <tr><td>Bus1 Slack</td><td class="mono green">1.0500</td><td class="mono">0.000</td><td class="mono">+43.83</td><td class="mono">+24.01</td></tr>
-    <tr><td>Bus2 PV</td><td class="mono green">1.0500</td><td class="mono">+0.108</td><td class="mono">+50.00</td><td class="mono">+22.02</td></tr>
-    <tr><td>Bus6 집전</td><td class="mono">1.0390</td><td class="mono">−0.564</td><td class="mono">0</td><td class="mono">0</td></tr>
-    <tr><td>Bus7 변전</td><td class="mono amber">0.9816</td><td class="mono">−5.313</td><td class="mono">0</td><td class="mono">0</td></tr>
-    <tr><td>Bus3 부하</td><td class="mono amber">0.9525</td><td class="mono">−7.830</td><td class="mono">−30.00</td><td class="mono">−9.86</td></tr>
-    <tr><td>Bus4 부하</td><td class="mono amber">0.9576</td><td class="mono">−7.399</td><td class="mono">−25.00</td><td class="mono">−8.22</td></tr>
-    <tr><td>Bus5 부하</td><td class="mono rose">0.9473</td><td class="mono">−8.266</td><td class="mono">−35.00</td><td class="mono">−11.50</td></tr>
+    <tr><td>Bus1 Slack</td><td class="mono green">1.0500</td><td class="mono">0.000</td><td class="mono">+40.74</td><td class="mono">+18.0</td></tr>
+    <tr><td>Bus2 PV</td><td class="mono green">1.0500</td><td class="mono">+0.073</td><td class="mono">+50.00</td><td class="mono">+15.0</td></tr>
+    <tr><td>Bus6 집전</td><td class="mono">1.0468</td><td class="mono">−0.304</td><td class="mono">0</td><td class="mono">0</td></tr>
+    <tr><td>Bus7 변전</td><td class="mono amber">1.0327</td><td class="mono">−2.208</td><td class="mono">0</td><td class="mono">0</td></tr>
+    <tr><td>Bus3 부하</td><td class="mono amber">1.0167</td><td class="mono">−3.737</td><td class="mono">−30.00</td><td class="mono">−9.86</td></tr>
+    <tr><td>Bus4 부하</td><td class="mono amber">1.0195</td><td class="mono">−3.479</td><td class="mono">−25.00</td><td class="mono">−8.22</td></tr>
+    <tr><td>Bus5 부하</td><td class="mono rose">1.0139</td><td class="mono">−3.997</td><td class="mono">−35.00</td><td class="mono">−11.50</td></tr>
   </tbody>
 </table></div>
-<p style="font-size:12px; color:var(--subtext);">Bus5가 최저전압(0.947pu, 부하 최대). 모두 0.94pu 이상 → 정상 운전. 수렴 후에는 모든 mismatch가 사실상 0.</p>
+<p style="font-size:12px; color:var(--subtext);">Bus5가 최저전압(1.014pu, 부하 최대). 모두 1.0pu 이상 → 매우 건전한 운전. 실제 계통처럼 전압이 1.0 근처로 평탄하게 유지됨.</p>
 
 <h3>9) 임피던스는 고정인데 부하를 바꿔도 되나 + PF vs 암산</h3>
 <p><strong>아니요. 임피던스(R, X)는 바뀌지 않습니다.</strong> 계통 방정식은 <strong>두 종류의 양</strong>으로 나뉩니다.</p>
@@ -662,8 +662,8 @@ iter3 → iter4:  8.6e-7  → 2.0e-13 ≈ (8.6e-7)^2      (제곱 그대로!)
                     선로 손실 I^2*R 은 전류의 제곱 → 부하 2배면 손실 4배
 
 예) "부하 90MW니까 발전 90MW" (암산)
-   실제 PF: 발전 = 90MW(부하) + <span class="amber">3.83MW(손실)</span> = 93.83MW
-            게다가 Bus5 전압이 0.947pu까지 떨어짐 ← 암산으로는 못 봄</div>
+   실제 PF: 발전 = 90MW(부하) + <span class="amber">0.74MW(손실)</span> = 90.74MW
+            게다가 Bus5 전압이 1.014pu까지 떨어짐 ← 암산으로는 못 봄</div>
 <div class="highlight-box">
   <strong>한 줄 요약:</strong> 암산은 <strong>"흐르냐/안 흐르냐"</strong>(정성적)를 보고, PF는 <strong>"얼마나, 몇 볼트로, 손실은, 위반은"</strong>(정량적)을 봅니다. 765kV 수백 모선 계통에서 0.05pu 전압강하나 95% 선로 부하율 같은 위험은 오직 PF로만 잡아냅니다.
 </div>
@@ -726,21 +726,21 @@ Bus2(PV)   -X-────┘</div>
 </div>
 
 <h3>선로4 개방 → 모선3만 고립 (30MW)</h3>
-<p>y₇₃(1.66−j6.22)이 빠지고, 모선3은 선로4 하나로만 연결돼 고립됩니다. 모선7 대각항이 그만큼 감소:</p>
+<p>y₇₃(1.92−j9.62)이 빠지고, 모선3은 선로4 하나로만 연결돼 고립됩니다. 모선7 대각항이 그만큼 감소:</p>
 <div class="formula">===== 선로4 개방 =====
 가압모선: 1,2,6,7,4,5 | 고립: 3
-Y77: 6.90-j28.29  -->  <span class="amber">5.24 - j22.06</span>   (y73 만큼 감소) ✓
+Y77: 6.39-j53.83  -->  <span class="amber">4.47 - j44.21</span>   (y73 만큼 감소) ✓
 → 모선3의 30MW만 상실, 나머지 계통은 정상 수렴</div>
 
 <h3>선로4 개방 시 실제 Ybus 행렬 (7×7 → 6×6)</h3>
 <p>모선3이 고립되면 행렬에서 <strong>3번 행·열이 통째로 삭제</strong>됩니다. 남는 가압모선은 {1,2,6,7,4,5} 6개. 아래는 엔진이 실제로 만든 행렬입니다.</p>
 <div class="formula" style="font-size:11px; line-height:1.5;">          Bus1            Bus2            Bus6            Bus7            Bus4            Bus5
-Bus1 |  10.00-j30.00     0               <span class="amber">-10.00+j30.00</span>    0               0               0
-Bus2 |   0              10.00-j30.00    <span class="amber">-10.00+j30.00</span>    0               0               0
-Bus6 | <span class="amber">-10.00+j30.00</span>  <span class="amber">-10.00+j30.00</span>   21.92-j69.62    <span class="amber">-1.92+j9.62</span>     0               0
-Bus7 |   0               0              <span class="amber">-1.92+j9.62</span>    <span class="rose">5.24-j22.06</span>     <span class="amber">-1.66+j6.22</span>    <span class="amber">-1.66+j6.22</span>
-Bus4 |   0               0               0              <span class="amber">-1.66+j6.22</span>     1.66-j6.22      0
-Bus5 |   0               0               0              <span class="amber">-1.66+j6.22</span>     0               1.66-j6.22</div>
+Bus1 |  6.60-j66.01      0               <span class="amber">-6.60+j66.01</span>    0               0               0
+Bus2 |   0              6.60-j66.01     <span class="amber">-6.60+j66.01</span>    0               0               0
+Bus6 | <span class="amber">-6.60+j66.01</span>   <span class="amber">-6.60+j66.01</span>   13.83-j157.00   <span class="amber">-0.62+j24.98</span>    0               0
+Bus7 |   0               0              <span class="amber">-0.62+j24.98</span>   <span class="rose">4.47-j44.21</span>     <span class="amber">-1.92+j9.62</span>    <span class="amber">-1.92+j9.62</span>
+Bus4 |   0               0               0              <span class="amber">-1.92+j9.62</span>     1.92-j9.62      0
+Bus5 |   0               0               0              <span class="amber">-1.92+j9.62</span>     0               1.92-j9.62</div>
 
 <h3>섬 운전과 실제 계통의 차이</h3>
 <p>선로1 개방 시 Bus2+Bus6+Bus7+부하는 물리적으로 서로 연결돼 있지만, Slack(기준)을 잃은 "섬"이라 이 모델은 정전 처리합니다.</p>
@@ -773,10 +773,10 @@ Bus5 |   0               0               0              <span class="amber">-1.6
 <div class="table-wrap"><table>
   <thead><tr><th>모선</th><th>상태</th><th>V (pu) 평상시→선로4개방</th><th>비고</th></tr></thead>
   <tbody>
-    <tr><td>Bus1 Slack</td><td class="green">가압</td><td class="mono">발전 43.8→12.0 MW</td><td>잃은 부하만큼 출력 감소</td></tr>
-    <tr><td>Bus3 부하</td><td class="rose">고립(정전)</td><td class="mono">0.9525 → 0 (탈락)</td><td>30MW 상실</td></tr>
-    <tr><td>Bus4 부하</td><td class="green">가압</td><td class="mono">0.9576 → 0.9834</td><td>전압 회복 ↑</td></tr>
-    <tr><td>Bus5 부하</td><td class="green">가압</td><td class="mono">0.9473 → 0.9734</td><td>전압 회복 ↑</td></tr>
+    <tr><td>Bus1 Slack</td><td class="green">가압</td><td class="mono">발전 40.7→10.5 MW</td><td>잃은 부하만큼 출력 감소</td></tr>
+    <tr><td>Bus3 부하</td><td class="rose">고립(정전)</td><td class="mono">1.0167 → 0 (탈락)</td><td>30MW 상실</td></tr>
+    <tr><td>Bus4 부하</td><td class="green">가압</td><td class="mono">1.0195 → 1.0256</td><td>전압 회복 ↑</td></tr>
+    <tr><td>Bus5 부하</td><td class="green">가압</td><td class="mono">1.0139 → 1.0201</td><td>전압 회복 ↑</td></tr>
   </tbody>
 </table></div>
 </div>
@@ -789,24 +789,24 @@ Bus5 |   0               0               0              <span class="amber">-1.6
 
 <div class="formula">P_loss = P_from + P_to  =  g_ij*(Vi^2 + Vj^2 - 2*Vi*Vj*cos(θi-θj))  =  |I|^2 * R</div>
 
-<h3>실제 손실 (총 3.825 MW = 부하의 4.25%)</h3>
+<h3>실제 손실 (총 0.74 MW = 부하의 0.82%)</h3>
 <div class="table-wrap"><table>
   <thead><tr><th>선로</th><th>조류 (MW)</th><th>손실 (MW)</th><th>부하율</th><th>비중</th></tr></thead>
   <tbody>
-    <tr><td>선로1 (1→6)</td><td class="mono">43.8</td><td class="mono">0.226</td><td class="mono">41.6%</td><td><div style="background:#38bdf822;height:8px;border-radius:4px;"><div style="background:var(--accent);height:8px;border-radius:4px;width:12%"></div></div></td></tr>
-    <tr><td>선로2 (2→6)</td><td class="mono">50.0</td><td class="mono">0.271</td><td class="mono">45.5%</td><td><div style="background:#38bdf822;height:8px;border-radius:4px;"><div style="background:var(--accent);height:8px;border-radius:4px;width:14%"></div></div></td></tr>
-    <tr><td><strong>변압기 TR (6→7)</strong></td><td class="mono">93.3</td><td class="mono rose">1.981</td><td class="mono">57.5%</td><td><div style="background:#f43f5e22;height:8px;border-radius:4px;"><div style="background:var(--rose);height:8px;border-radius:4px;width:100%"></div></div></td></tr>
-    <tr><td>선로4 (7→3)</td><td class="mono">30.4</td><td class="mono">0.440</td><td class="mono">32.5%</td><td><div style="background:#fbbf2422;height:8px;border-radius:4px;"><div style="background:var(--amber);height:8px;border-radius:4px;width:22%"></div></div></td></tr>
-    <tr><td>선로5 (7→4)</td><td class="mono">25.3</td><td class="mono">0.302</td><td class="mono">27.0%</td><td><div style="background:#fbbf2422;height:8px;border-radius:4px;"><div style="background:var(--amber);height:8px;border-radius:4px;width:15%"></div></div></td></tr>
-    <tr><td>선로6 (7→5)</td><td class="mono">35.6</td><td class="mono">0.605</td><td class="mono">38.2%</td><td><div style="background:#fbbf2422;height:8px;border-radius:4px;"><div style="background:var(--amber);height:8px;border-radius:4px;width:31%"></div></div></td></tr>
-    <tr style="background:#1e293b;"><td><strong>합계</strong></td><td></td><td class="mono green"><strong>3.825 MW</strong></td><td></td><td class="mono subtext">부하의 4.25%</td></tr>
+    <tr><td>선로1 (1→6)</td><td class="mono">40.7</td><td class="mono">0.03</td><td class="mono">41.6%</td><td><div style="background:#38bdf822;height:8px;border-radius:4px;"><div style="background:var(--accent);height:8px;border-radius:4px;width:12%"></div></div></td></tr>
+    <tr><td>선로2 (2→6)</td><td class="mono">50.0</td><td class="mono">0.04</td><td class="mono">45.5%</td><td><div style="background:#38bdf822;height:8px;border-radius:4px;"><div style="background:var(--accent);height:8px;border-radius:4px;width:15%"></div></div></td></tr>
+    <tr><td>변압기 TR (6→7)</td><td class="mono">90.7</td><td class="mono">0.09</td><td class="mono">57.5%</td><td><div style="background:#38bdf822;height:8px;border-radius:4px;"><div style="background:var(--accent);height:8px;border-radius:4px;width:35%"></div></div></td></tr>
+    <tr><td>선로4 (7→3)</td><td class="mono">30.2</td><td class="mono rose">0.19</td><td class="mono">32.5%</td><td><div style="background:#f43f5e22;height:8px;border-radius:4px;"><div style="background:var(--rose);height:8px;border-radius:4px;width:73%"></div></div></td></tr>
+    <tr><td>선로5 (7→4)</td><td class="mono">25.1</td><td class="mono amber">0.13</td><td class="mono">27.0%</td><td><div style="background:#fbbf2422;height:8px;border-radius:4px;"><div style="background:var(--amber);height:8px;border-radius:4px;width:50%"></div></div></td></tr>
+    <tr><td><strong>선로6 (7→5)</strong></td><td class="mono">35.3</td><td class="mono rose">0.26</td><td class="mono">38.2%</td><td><div style="background:#f43f5e22;height:8px;border-radius:4px;"><div style="background:var(--rose);height:8px;border-radius:4px;width:100%"></div></div></td></tr>
+    <tr style="background:#1e293b;"><td><strong>합계</strong></td><td></td><td class="mono green"><strong>0.74 MW</strong></td><td></td><td class="mono subtext">부하의 0.82%</td></tr>
   </tbody>
 </table></div>
 
-<div class="highlight-box"><strong>왜 TR이 손실 1위(52%)인가?</strong> TR엔 전 부하 90MW가 집중 통과합니다. P_loss = I²R이라 통과전류가 크면 손실이 급증 — TR 손실(1.98MW)이 전체의 절반 이상. R이 다른 선로와 비슷해도(0.02) 전류가 압도적이라 손실 최대.</div>
+<div class="highlight-box"><strong>왜 154kV 부하선(선로4·5·6)이 손실 대부분인가?</strong> 이번 KEPCO 기반 임피던스에서는 345kV 송전선(0.0015+j0.015)과 변압기 TR(0.001+j0.04)의 저항이 매우 작아 손실이 미미합니다(각 0.03~0.09MW). 반면 부하 전류가 실제로 흐르는 154kV 선로(0.02+j0.10)는 저항이 10배 이상 커서 P_loss = I²R 손실이 여기 집중됩니다 — 선로6(0.26MW)이 최대. 즉 임피던스가 작은 상위 송전망은 손실이 거의 없고, 말단 154kV 부하선이 손실의 주범입니다.</div>
 
 <h4>손실 저감</h4>
-<ul><li>TR 병렬화 → 전류 반감 → 손실 1/4</li><li>역률 개선(콘덴서) → 선로전류 감소</li><li>전압 상승 → I = P/V 감소 → I²R 감소</li></ul>
+<ul><li>154kV 부하선 증설·병렬화 → 전류 반감 → 손실 1/4</li><li>역률 개선(콘덴서) → 선로전류 감소</li><li>전압 상승 → I = P/V 감소 → I²R 감소</li></ul>
 </div>
 
 
