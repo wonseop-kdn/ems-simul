@@ -274,7 +274,7 @@ function VoltageProfileChart({ result }: { result: SolveResult }) {
         })}
       </svg>
       <p className="mt-1 text-[10px] text-slate-500">
-        Slack(발전) → 집전 → 배전 → 부하 순. 전기적으로 멀어질수록 전압이 강하됩니다.
+        Slack(발전) → 집전 → 변전 → 부하 순. 전기적으로 멀어질수록 전압이 강하됩니다.
         붉은 영역(&lt;0.94pu)은 저전압 경보 구간.
       </p>
     </div>

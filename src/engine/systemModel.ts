@@ -2,7 +2,7 @@ import type { BranchDef, BusDef, OperatingState } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  계통 모델 정의
-//  구조: [Slack G] [PV G] ─→ (모선6 수집) ═TR═ (모선7 배전) ─→ 부하 3 / 4 / 5
+//  구조: [Slack G] [PV G] ─→ (모선6 수집) ═TR═ (모선7 1차변전) ─→ 부하 3 / 4 / 5
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const BASE_MVA = 100; // 계통 기준용량
@@ -49,7 +49,7 @@ export const BUSES: BusDef[] = [
     id: 7,
     name: 'Bus 7',
     type: 'pq',
-    role: '변압기 2차측 변전 모선 (Secondary Substation) · 소비 0',
+    role: '변압기 2차측 1차변전 모선 (154kV Substation) · 소비 0',
     category: 'distribution',
     x: 640,
     y: 300,
@@ -59,7 +59,7 @@ export const BUSES: BusDef[] = [
     id: 3,
     name: 'Bus 3',
     type: 'pq',
-    role: '부하 수용가 모선 3 (Radial Customer)',
+    role: '154kV 수전 부하 모선 3 (Radial Customer)',
     category: 'load',
     x: 885,
     y: 150,
@@ -69,7 +69,7 @@ export const BUSES: BusDef[] = [
     id: 4,
     name: 'Bus 4',
     type: 'pq',
-    role: '부하 수용가 모선 4 (Radial Customer)',
+    role: '154kV 수전 부하 모선 4 (Radial Customer)',
     category: 'load',
     x: 885,
     y: 300,
@@ -79,7 +79,7 @@ export const BUSES: BusDef[] = [
     id: 5,
     name: 'Bus 5',
     type: 'pq',
-    role: '부하 수용가 모선 5 (Radial Customer)',
+    role: '154kV 수전 부하 모선 5 (Radial Customer)',
     category: 'load',
     x: 885,
     y: 450,

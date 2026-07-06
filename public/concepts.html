@@ -187,7 +187,7 @@
 <h3>실습 계통 구성 (실제 코드값)</h3>
 <div class="sys-diagram"><span class="gen">Bus1 (Slack Gen, 345kV)</span> --<span class="br">선로1 (0.0015+j0.015)</span>--&gt; <span class="bus">Bus6 (집전, 345kV)</span>
 <span class="gen">Bus2 (PV Gen 50MW, 345kV)</span> -<span class="br">선로2 (0.0015+j0.015)</span>-&gt; <span class="bus">Bus6</span>
-<span class="bus">Bus6</span> ==<span class="tr">변압기 TR (0.001+j0.04)</span>==&gt; <span class="bus">Bus7 (변전, 154kV)</span>
+<span class="bus">Bus6</span> ==<span class="tr">변압기 TR (0.001+j0.04)</span>==&gt; <span class="bus">Bus7 (1차변전, 154kV)</span>
 <span class="bus">Bus7</span> --<span class="br">선로4 (0.02+j0.10)</span>--&gt; <span class="ld">Bus3 (부하 30MW)</span>
 <span class="bus">Bus7</span> --<span class="br">선로5 (0.02+j0.10)</span>--&gt; <span class="ld">Bus4 (부하 25MW)</span>
 <span class="bus">Bus7</span> --<span class="br">선로6 (0.02+j0.10)</span>--&gt; <span class="ld">Bus5 (부하 35MW)</span></div>
@@ -212,8 +212,8 @@
     <tr><td>Bus1</td><td class="mono">345 kV</td><td>Slack 발전기</td><td>위상기준, 균형자</td></tr>
     <tr><td>Bus2</td><td class="mono">345 kV</td><td>PV 발전기 (50MW)</td><td>AVR로 V=1.05 유지</td></tr>
     <tr><td>Bus6</td><td class="mono">345 kV</td><td>집전 모선</td><td>양 발전기 전력 합류</td></tr>
-    <tr><td>Bus7</td><td class="mono">154 kV</td><td>변전 모선</td><td>TR 거쳐 강압</td></tr>
-    <tr><td>Bus3,4,5</td><td class="mono">154 kV</td><td>부하 모선</td><td>30/25/35 MW</td></tr>
+    <tr><td>Bus7</td><td class="mono">154 kV</td><td>1차 변전 모선</td><td>TR 거쳐 강압</td></tr>
+    <tr><td>Bus3,4,5</td><td class="mono">154 kV</td><td>154kV 수전 부하</td><td>30/25/35 MW</td></tr>
   </tbody>
 </table></div>
 </div>

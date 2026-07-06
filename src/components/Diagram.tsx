@@ -17,9 +17,9 @@ interface Props {
 }
 
 const STAGES = [
-  { label: '발전단 · GENERATION', x: 40, w: 240, color: COLORS.pv },
-  { label: '수집 · 변전단 · SUBSTATION', x: 300, w: 440, color: COLORS.distribution },
-  { label: '수용가 배전단 · DEMAND', x: 760, w: 210, color: COLORS.load },
+  { label: '발전·송전단 · GENERATION 345kV', x: 40, w: 240, color: COLORS.pv },
+  { label: '1차 변전단 · SUBSTATION 345/154kV', x: 300, w: 440, color: COLORS.distribution },
+  { label: '154kV 수전 부하 · DEMAND', x: 760, w: 210, color: COLORS.load },
 ];
 
 export default function Diagram({ result, onToggleBreaker, onHover, hover }: Props) {

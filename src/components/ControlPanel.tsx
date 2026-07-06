@@ -88,7 +88,7 @@ export default function ControlPanel({
               <Slider
                 key={id}
                 label={`${bus.name} 수용가 부하`}
-                sub={`모선 ${id} · ${bus.baseKV}kV 배전`}
+                sub={`모선 ${id} · ${bus.baseKV}kV 수전`}
                 value={state.loads[id] ?? 0}
                 min={LIMITS.load.min}
                 max={LIMITS.load.max}
